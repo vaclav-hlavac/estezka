@@ -1,6 +1,7 @@
 <?php
 
 namespace model;
+require_once __DIR__ . '/../autoloader.php';
 
 use PDO;
 

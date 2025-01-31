@@ -1,6 +1,9 @@
 <?php
 
 namespace model;
+use PDO;
+
+require_once __DIR__ . '/../autoloader.php';
 
 class Troop {
     public $id_troop;
@@ -20,7 +23,7 @@ class Troop {
     }
 
     // Uložení jednotky do databáze
-    public static function all(\PDO $pdo){
+    public static function all($pdo){
         $stmt = $pdo->query("SELECT * FROM troop");
         $troops = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return $troops;
