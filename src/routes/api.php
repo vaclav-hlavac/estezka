@@ -31,7 +31,17 @@ return function (App $app) {
     // Získat všechny oddíly
     $app->get('/troops', [$troopController, 'getAllTroops']);
 
+    $app->get('/troops/{id}', [$troopController, 'getTroop']);
+
+
+    $app->put('/troops/{id}', [$troopController, 'updateTroop']);
+
+    $app->delete('/troops/{id}', [$troopController, 'deleteTroop']);
+
+
     $app->post('/troops', [$troopController, 'createTroop']);
+
+
 
 };
 
