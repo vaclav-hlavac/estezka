@@ -16,26 +16,6 @@ class Troop extends BaseModel{
         $this->name = $name;
     }
 
-    // Načtení jednotky z databáze podle ID
-/*    public static function find($id, $pdo) {
-        $stmt = $pdo->prepare("SELECT * FROM troop WHERE id_troop = ?");
-        $stmt->execute([$id]);
-
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$data) {
-            return null; // Nebyl nalezen žádný záznam
-        }
-
-        return new Troop($data['name'], $data['id_troop']);
-    }*/
-
-    // Uložení jednotky do databáze
-/*    public static function all($pdo){
-        $stmt = $pdo->query("SELECT * FROM troop");
-        $troops = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return $troops;
-    }*/
-
     public function save($pdo) {
         $tableName = static::$tableName;
         if (isset($this->id)) {
@@ -50,12 +30,6 @@ class Troop extends BaseModel{
         }
 
     }
-
-    // Smazání jednotky
-   /* public function delete($pdo) {
-        $stmt = $pdo->prepare("DELETE FROM troop WHERE id_troop = ?");
-        $stmt->execute([$this->id_troop]);
-    }*/
 
     // Převod objektu na asociativní pole (pro JSON)
     public function toArray() {
