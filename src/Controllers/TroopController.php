@@ -7,7 +7,7 @@ use App\Models\Gang;
 use OpenApi\Annotations as OA;
 use App\Models\BaseModel;
 use App\Models\Troop;
-
+use PhpParser\Node\Expr\Array_;
 
 
 /**
@@ -34,7 +34,7 @@ class TroopController
         $troops = Troop::all($this->pdo);
         $response->getBody()->write(json_encode($troops));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
-    }
+    }//todo ostatni metody predelat podle noveho modelu
 
     /**
      * @OA\Post(
@@ -54,8 +54,8 @@ class TroopController
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        $troop = new Troop($data['name']);
-        $troop->save($this->pdo);
+        $troop = new Troop($this->pdo, $data);
+        $troop->save();
 
         $response->getBody()->write(json_encode($troop));
         return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
@@ -77,11 +77,11 @@ class TroopController
      * )
      */
     public function getTroop($request, $response, $args) {
-        $troop = Troop::find($args['id'], $this->pdo);
+        $troop = Troop::find($this->pdo, $args['id']);
         if ($troop) {
+            error_log(json_encode($troop));
             $response->getBody()->write(json_encode($troop));
             return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
-
         } else {
             $response->getBody()->write(json_encode(['message' => 'Troop not found']));
             return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
@@ -113,12 +113,12 @@ class TroopController
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        $troopAsoc = Troop::find($args['id'], $this->pdo);
+        $troop = Troop::find($this->pdo, $args['id']);
 
-        if (!$troopAsoc) {
+        if (!$troop) {
             // Pokud troop neexistuje, vytvoříme nový
-            $troop = new Troop($data['name']);
-            $troop->save($this->pdo);
+            $troop = new Troop($this->pdo, $data);
+            $troop->save();
 
             $response->getBody()->write(json_encode([
                 'message' => 'Troop created',
@@ -128,8 +128,8 @@ class TroopController
         }
 
         // Pokud troop existuje, aktualizujeme ho
-        $troop = new Troop($data['name'], $troopAsoc['id_troop']);
-        $troop->save($this->pdo);
+        $troop->name = $data['name'];
+        $troop->save();
 
         $response->getBody()->write(json_encode([
             'message' => 'Troop updated',
@@ -154,14 +154,13 @@ class TroopController
      * )
      */
     public function deleteTroop($request, $response, $args) {
-        $troop = Troop::find($args['id'], $this->pdo);
+        $troop = Troop::find($this->pdo, $args['id']);
         if (!$troop) {
             $response->getBody()->write(json_encode(['message' => 'Troop not found']));
             return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
         }
 
-        $troop = new Troop($troop['name'], $troop['id_troop']);
-        $troop->delete($this->pdo);
+        $troop->delete();
         $response->getBody()->write(json_encode(['message' => 'Troop deleted']));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     }
@@ -171,7 +170,7 @@ class TroopController
      * @OA\Post(
      *     path="/troops/{id}/gang",
      *     summary="Vytvořit novou družinu v oddíle",
-     *     tags={"Troops"},
+     *     tags={"Troops", "Gangs"},
      *     @OA\Parameter(
      *             name="id",
      *             in="path",
@@ -186,15 +185,25 @@ class TroopController
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
 
+        //Arguments control
         if (!isset($data['name'])) {
             $response->getBody()->write(json_encode(['message' => 'Missing required field: name']));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        $troop = new Gang($data['name'], $args['id']);
-        $troop->save($this->pdo);
+        //Existing troop control
+        $troop = Troop::find($this->pdo, $args['id']);
+        if (!$troop) {
+            $response->getBody()->write(json_encode(['message' => 'Troop not found']));
+            return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
+        }
 
-        $response->getBody()->write(json_encode($troop));
+        //creating new gang
+        $data['troopId'] = $args['id'];
+        $gang = new Gang($this->pdo, $data);
+        $gang->save();
+
+        $response->getBody()->write(json_encode($gang));
         return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
     }
 
@@ -214,13 +223,14 @@ class TroopController
      * )
      */
     public function getTroopGangs($request, $response, $args) {
-        $troopAsoc = Troop::find($args['id'], $this->pdo);
-        $troop = new Troop($troopAsoc['name'], $troopAsoc['id']);
+        if(Troop::find($this->pdo, $args['id']) == null){
+            $response->getBody()->write(json_encode(['message' => 'Troop not found']));
+            return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
+        }
 
-        $gangsAsoc = $troop->getGangs($this->pdo);
+        $gangs = Gang::getAllByTroopId($this->pdo, $args['id']);
 
-
-        $response->getBody()->write(json_encode($gangsAsoc));
+        $response->getBody()->write(json_encode($gangs));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     }
 }

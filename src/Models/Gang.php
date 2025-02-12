@@ -15,25 +15,55 @@ class Gang  extends BaseModel
      * @param $troopId
      * @param $id
      */
-    public function __construct($name, $troopId, $id = null)
+    public function __construct($pdo, array $data)
     {
-        parent::__construct($id);
-        $this->name = $name;
-        $this->troopId = $troopId;
+        if (isset($data['id_gang'])) {
+            $data['id'] = $data['id_gang'];
+        }
+        if (isset($data['id_troop'])) {
+            $data['troopId'] = $data['id_troop'];
+        }
+
+        parent::__construct($pdo, $data['id'] ?? null);
+        $this->name = $data['name'] ?? null;
+        $this->troopId = $data['troopId'] ?? null;
     }
 
-    public function save($pdo)
+    public function save()
     {
         $tableName = static::$tableName;
         if (isset($this->id)) {
             // Aktualizace existující družiny
-            $stmt = $pdo->prepare("UPDATE $tableName SET name = ?, id_troop = ? WHERE id_gang = ?");
+            $stmt = $this->pdo->prepare("UPDATE $tableName SET name = ?, id_troop = ? WHERE id_gang = ?");
             $stmt->execute([$this->name, $this->troopId, $this->id]);
         } else {
             // Vložení nové družiny
-            $stmt = $pdo->prepare("INSERT INTO $tableName (name, id_troop) VALUES (?, ?)");
+            $stmt = $this->pdo->prepare("INSERT INTO $tableName (name, id_troop) VALUES (?, ?)");
             $stmt->execute([$this->name, $this->troopId]);
-            $this->id = $pdo->lastInsertId();
+            $this->id = $this->pdo->lastInsertId();
         }
+    }
+
+    public static function getAllByTroopId($pdo, $troopId)
+    {
+        $tableName = static::$tableName;
+        $stmt = $pdo->prepare("SELECT * FROM $tableName WHERE id_troop = ?");
+        $stmt->execute([$troopId]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $results = [];
+        foreach ($rows as $row) {
+            $results[] = new static($pdo, $row);
+        }
+        return $results;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'id' => $this->id,
+            'troopId' => $this->troopId,
+            'name' => $this->name
+        ];
     }
 }

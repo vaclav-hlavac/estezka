@@ -51,6 +51,9 @@ return function (App $app) {
 
 
 
+
+
+
     // Middleware for nonexisting pages - return 404
     $app->add(function (Request $request, RequestHandler $handler): Response {
         try {

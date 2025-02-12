@@ -123,12 +123,66 @@
                     }
                 }
             }
+        },
+        "/troops/{id}/gang": {
+            "get": {
+                "tags": [
+                    "Troops",
+                    "Gangs"
+                ],
+                "summary": "Získat všechny družiny oddílu",
+                "operationId": "250c8f043b40759c67fe1b89a6c6ef6d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Seznam oddílů"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Troops"
+                ],
+                "summary": "Vytvořit novou družinu v oddíle",
+                "operationId": "7e7215f6ae3f7198986a5d90aa20103a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Nová družina vytvořena"
+                    },
+                    "400": {
+                        "description": "Chybějící název"
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
             "name": "Troops",
             "description": "Správa oddílů"
+        },
+        {
+            "name": "Gangs",
+            "description": "Gangs"
         }
     ]
 }

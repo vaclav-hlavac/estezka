@@ -1,49 +1,48 @@
 <?php
 
 namespace App\Models;
+use JsonSerializable;
 use PDO;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Troop extends BaseModel{
     static protected $tableName = "troop";
-
     public $name;
 
-    // Konstruktor pro vytvoření nové jednotky
-    public function __construct($name, $id_troop = null) {
-        parent::__construct($id_troop);
-        $this->name = $name;
+
+    /**
+     * @param $pdo
+     * @param array $data associative array with id and name
+     */
+    public function __construct($pdo, array $data) {
+        error_log("Troop: ".json_encode($data));
+
+        if (isset($data['id_troop'])) {
+            $data['id'] = $data['id_troop'];
+        }
+        parent::__construct($pdo, $data['id'] ?? null);
+        $this->name = $data['name'] ?? null;
     }
 
-    public function save($pdo) {
+    public function save() {
         $tableName = static::$tableName;
         if (isset($this->id)) {
             // Aktualizace existující jednotky
-            $stmt = $pdo->prepare("UPDATE $tableName SET name = ? WHERE id_troop = ?");
+            $stmt = $this->pdo->prepare("UPDATE $tableName SET name = ? WHERE id_troop = ?");
             $stmt->execute([$this->name, $this->id]);
         } else {
             // Vložení nové jednotky
-            $stmt = $pdo->prepare("INSERT INTO $tableName (name) VALUES (?)");
+            $stmt = $this->pdo->prepare("INSERT INTO $tableName (name) VALUES (?)");
             $stmt->execute([$this->name]);
-            $this->id = $pdo->lastInsertId();
+            $this->id = $this->pdo->lastInsertId();
         }
-
     }
 
-    public function getGangs($pdo)
+    public function jsonSerialize(): mixed
     {
-        $tableName = static::$tableName;
-        $stmt = $pdo->query("SELECT * FROM $tableName WHERE id_troop = ?");
-        $stmt->execute([$this->id]);
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
-    // Převod objektu na asociativní pole (pro JSON)
-    public function toArray() {
         return [
-            'id_troop' => $this->id_troop,
+            'id' => $this->id,
             'name' => $this->name
         ];
     }
