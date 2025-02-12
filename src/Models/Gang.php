@@ -1,6 +1,6 @@
 <?php
 
-namespace model;
+namespace App\Models;
 
 
 class Gang  extends BaseModel

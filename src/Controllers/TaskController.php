@@ -1,9 +1,8 @@
 <?php
 
-namespace controller;
-require_once __DIR__ . '/../autoloader.php';
-
-use model\Task;
+namespace App\Controllers;
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Models\Task;
 
 class TaskController {
     private $pdo;

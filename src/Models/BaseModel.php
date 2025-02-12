@@ -1,9 +1,9 @@
 <?php
 
-namespace model;
+namespace App\Models;
 use PDO;
 
-require_once __DIR__ . '/../autoloader.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 abstract class BaseModel
 {

@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../src/autoloader.php'; // Pokud používáš vlastní autoloader
 require '../vendor/autoload.php'; // Autoload Slim a všechny závislosti
 
 use Slim\Factory\AppFactory;

@@ -1,7 +1,9 @@
 <?php
 
-namespace model;
-require_once __DIR__ . '/../autoloader.php';
+namespace App\Models;
+//require_once __DIR__ . '/../autoloader.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 
 use PDO;
 

@@ -1,7 +1,7 @@
 <?php
 
-namespace config;
-require_once __DIR__ . '/../autoloader.php';
+namespace App\Config;
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use PDO;
 

@@ -1,15 +1,16 @@
 <?php
-require_once __DIR__ . '/../autoloader.php';
+//require_once __DIR__ . '/../autoloader.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 
-use config\Database;
+use App\Config\Database;
 use Slim\App;
 use Slim\Exception\HttpNotFoundException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use controller\TaskController;
-use controller\TroopController;
+use App\Controllers\TaskController;
+use App\Controllers\TroopController;
 
 return function (App $app) {
     $pdo = Database::connect();

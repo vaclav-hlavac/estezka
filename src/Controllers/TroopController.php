@@ -1,10 +1,18 @@
 <?php
 
-namespace controller;
-require_once __DIR__ . '/../autoloader.php';
+namespace App\Controllers;
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-use model\BaseModel;
-use model\Troop;
+use OpenApi\Annotations as OA;
+use App\Models\BaseModel;
+use App\Models\Troop;
+
+
+
+/**
+ * @OA\Tag(name="Troops", description="Správa oddílů")
+ * @OA\PathItem(path="/troops")
+ */
 class TroopController
 {
     private $pdo;
@@ -13,12 +21,29 @@ class TroopController
         $this->pdo = $pdo;
     }
 
+    /**
+     * @OA\Get(
+     *     path="/troops",
+     *     tags={"Troops"},
+     *     summary="Získat všechny oddíly",
+     *     @OA\Response(response="200", description="Seznam oddílů")
+     * )
+     */
     public function getAllTroops($request, $response, $args) {
         $troops = Troop::all($this->pdo);
         $response->getBody()->write(json_encode($troops));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     }
 
+    /**
+     * @OA\Post(
+     *     path="/troops",
+     *     summary="Vytvořit nový oddíl",
+     *     tags={"Troops"},
+     *     @OA\Response(response="201", description="Nový oddíl"),
+     *     @OA\Response(response="400", description="Chybějící název")
+     * )
+     */
     public function createTroop($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
@@ -35,6 +60,21 @@ class TroopController
         return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
     }
 
+    /**
+     * @OA\Get(
+     *     path="/troops/{id}",
+     *     summary="Získat konkrétní oddíl",
+     *     tags={"Troops"},
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response="200", description="Popis oddílu"),
+     *     @OA\Response(response="401", description="Oddíl nenalezen")
+     * )
+     */
     public function getTroop($request, $response, $args) {
         $troop = Troop::find($args['id'], $this->pdo);
         if ($troop) {
@@ -47,6 +87,22 @@ class TroopController
         }
     }
 
+    /**
+     * @OA\Put(
+     *     path="/troops/{id}",
+     *     summary="Upravit oddíl",
+     *     tags={"Troops"},
+     *     @OA\Parameter(
+     *           name="id",
+     *           in="path",
+     *           required=true,
+     *           @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response="200", description="Nový oddíl vytvořen"),
+     *     @OA\Response(response="201", description="Oddíl upraven"),
+     *     @OA\Response(response="400", description="Chybí argument")
+     * )
+     */
     public function updateTroop($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
@@ -81,6 +137,21 @@ class TroopController
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/troops/{id}",
+     *     summary="Upravit oddíl",
+     *     tags={"Troops"},
+     *      @OA\Parameter(
+     *            name="id",
+     *            in="path",
+     *            required=true,
+     *            @OA\Schema(type="integer")
+     *      ),
+     *     @OA\Response(response="200", description="Oddíl smazán"),
+     *     @OA\Response(response="404", description="Oddíl nenalezen")
+     * )
+     */
     public function deleteTroop($request, $response, $args) {
         $troop = Troop::find($args['id'], $this->pdo);
         if (!$troop) {
