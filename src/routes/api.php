@@ -38,13 +38,16 @@ return function (App $app) {
 
     $app->get('/troops/{id}', [$troopController, 'getTroop']);
 
-
     $app->put('/troops/{id}', [$troopController, 'updateTroop']);
 
     $app->delete('/troops/{id}', [$troopController, 'deleteTroop']);
 
-
     $app->post('/troops', [$troopController, 'createTroop']);
+
+    $app->get('/troops/{id}/gangs', [$troopController, 'getTroopGangs']);
+
+    $app->post('/troops/{id}/gangs', [$troopController, 'createGang']);
+
 
 
 

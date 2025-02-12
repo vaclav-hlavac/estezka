@@ -26,11 +26,11 @@ class Gang  extends BaseModel
     {
         $tableName = static::$tableName;
         if (isset($this->id)) {
-            // Aktualizace existující jednotky
+            // Aktualizace existující družiny
             $stmt = $pdo->prepare("UPDATE $tableName SET name = ?, id_troop = ? WHERE id_gang = ?");
             $stmt->execute([$this->name, $this->troopId, $this->id]);
         } else {
-            // Vložení nové jednotky
+            // Vložení nové družiny
             $stmt = $pdo->prepare("INSERT INTO $tableName (name, id_troop) VALUES (?, ?)");
             $stmt->execute([$this->name, $this->troopId]);
             $this->id = $pdo->lastInsertId();

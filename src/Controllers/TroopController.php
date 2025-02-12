@@ -3,6 +3,7 @@
 namespace App\Controllers;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+use App\Models\Gang;
 use OpenApi\Annotations as OA;
 use App\Models\BaseModel;
 use App\Models\Troop;
@@ -112,9 +113,9 @@ class TroopController
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        $troop = Troop::find($args['id'], $this->pdo);
+        $troopAsoc = Troop::find($args['id'], $this->pdo);
 
-        if (!$troop) {
+        if (!$troopAsoc) {
             // Pokud troop neexistuje, vytvoříme nový
             $troop = new Troop($data['name']);
             $troop->save($this->pdo);
@@ -127,7 +128,7 @@ class TroopController
         }
 
         // Pokud troop existuje, aktualizujeme ho
-        $troop = new Troop($data['name'], $troop['id_troop']);
+        $troop = new Troop($data['name'], $troopAsoc['id_troop']);
         $troop->save($this->pdo);
 
         $response->getBody()->write(json_encode([
@@ -165,4 +166,61 @@ class TroopController
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     }
 
+
+    /**
+     * @OA\Post(
+     *     path="/troops/{id}/gang",
+     *     summary="Vytvořit novou družinu v oddíle",
+     *     tags={"Troops"},
+     *     @OA\Parameter(
+     *             name="id",
+     *             in="path",
+     *             required=true,
+     *             @OA\Schema(type="integer")
+     *       ),
+     *     @OA\Response(response="201", description="Nová družina vytvořena"),
+     *     @OA\Response(response="400", description="Chybějící název")
+     * )
+     */
+    public function createGang($request, $response, $args) {
+        $rawBody = $request->getBody()->getContents();
+        $data = json_decode($rawBody, true);
+
+        if (!isset($data['name'])) {
+            $response->getBody()->write(json_encode(['message' => 'Missing required field: name']));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+
+        $troop = new Gang($data['name'], $args['id']);
+        $troop->save($this->pdo);
+
+        $response->getBody()->write(json_encode($troop));
+        return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
+    }
+
+
+    /**
+     * @OA\Get(
+     *     path="/troops/{id}/gang",
+     *      summary="Získat všechny družiny oddílu",
+     *      tags={"Troops", "Gangs"},
+     *      @OA\Parameter(
+     *              name="id",
+     *              in="path",
+     *              required=true,
+     *              @OA\Schema(type="integer")
+     *        ),
+     *     @OA\Response(response="200", description="Seznam oddílů")
+     * )
+     */
+    public function getTroopGangs($request, $response, $args) {
+        $troopAsoc = Troop::find($args['id'], $this->pdo);
+        $troop = new Troop($troopAsoc['name'], $troopAsoc['id']);
+
+        $gangsAsoc = $troop->getGangs($this->pdo);
+
+
+        $response->getBody()->write(json_encode($gangsAsoc));
+        return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+    }
 }

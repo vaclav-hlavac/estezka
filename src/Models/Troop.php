@@ -31,6 +31,15 @@ class Troop extends BaseModel{
 
     }
 
+    public function getGangs($pdo)
+    {
+        $tableName = static::$tableName;
+        $stmt = $pdo->query("SELECT * FROM $tableName WHERE id_troop = ?");
+        $stmt->execute([$this->id]);
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
     // Převod objektu na asociativní pole (pro JSON)
     public function toArray() {
         return [

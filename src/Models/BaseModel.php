@@ -20,9 +20,11 @@ abstract class BaseModel
         $stmt->execute([$id]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
+
+        //return new static($this->pdo, $data);
     }
 
-    public static function all($pdo){
+    public function all($pdo){
         $tableName = static::$tableName;
         $stmt = $pdo->query("SELECT * FROM $tableName");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
