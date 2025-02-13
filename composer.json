@@ -15,7 +15,8 @@
       "App\\": "src/",
       "App\\Config\\": "src/Config/",
       "App\\Controllers\\": "src/Controllers/",
-      "App\\Models\\": "src/Models/"
+      "App\\Models\\": "src/Models/",
+      "App\\Middleware\\": "src/Middleware/"
     }
   },
   "require-dev": {

@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/Config" isTestSource="false" packagePrefix="App\Config\" />
       <sourceFolder url="file://$MODULE_DIR$/src/Controllers" isTestSource="false" packagePrefix="App\Controllers\" />
       <sourceFolder url="file://$MODULE_DIR$/src/Models" isTestSource="false" packagePrefix="App\Models\" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Middleware" isTestSource="false" packagePrefix="App\Middleware\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/fig/http-message-util" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/nikic/fast-route" />

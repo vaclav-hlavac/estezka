@@ -67,6 +67,7 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         'A' => 
         array (
             'App\\Models\\' => 11,
+            'App\\Middleware\\' => 15,
             'App\\Controllers\\' => 16,
             'App\\Config\\' => 11,
             'App\\' => 4,
@@ -187,6 +188,10 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         'App\\Models\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/Models',
+        ),
+        'App\\Middleware\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/Middleware',
         ),
         'App\\Controllers\\' => 
         array (

@@ -5,6 +5,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\Config\Database;
 use App\Controllers\AuthController;
+use App\Controllers\UserController;
+use App\Middleware\AuthMiddleware;
 use Slim\App;
 use Slim\Exception\HttpNotFoundException;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -15,54 +17,61 @@ use App\Controllers\TroopController;
 
 return function (App $app) {
     $pdo = Database::connect();
+    //************************************************************************
+    //************************* PUBLIC ROUTES ********************************
+    //************************************************************************
+
+    //************************** AUTH ***************************************
+    $authController = new AuthController($pdo);
+
+    $app->group('/auth', function ($auth) use ($authController) {
+        $auth->post('/register', [$authController, 'register']);
+        $auth->post('/login', [$authController, 'login']);
+    });
+
 
     //************************* TASK ****************************************
-
-
     $taskController = new TaskController($pdo);
 
-    // Získat všechny úkoly
-    $app->get('/tasks', [$taskController, 'getAllTasks']);
+    $app->group('/tasks', function ($tasks) use ($taskController) {
+        $tasks->get('', [$taskController, 'getAllTasks']);
+        $tasks->post('', [$taskController, 'createTask']);
 
-    // Získat úkol podle ID
-    $app->get('/tasks/{id}', [$taskController, 'getTask']);
+        $tasks->get('/{id}', [$taskController, 'getTask']);
+    });
 
-    // Vytvořit nový úkol
-    $app->post('/tasks', [$taskController, 'createTask']);
+    //************************* USER ****************************************
+    $userController = new UserController($pdo);
 
-    // Další routy pro update, delete
+    $app->group('/users', function ($tasks) use ($userController) {
+        $tasks->get('', [$userController, 'getAllUsers']);
 
+        $tasks->get('/{id}', [$userController, 'getTask']);
+    });
+
+    //************************************************************************
+    //************************* NON-PUBLIC ROUTES ****************************
+    //************************************************************************
 
 
     //************************* TROOP ****************************************
-
     $troopController = new TroopController($pdo);
-    $app->get('/troops', [$troopController, 'getAllTroops']);
 
-    $app->get('/troops/{id}', [$troopController, 'getTroop']);
+    $app->group('/troops', function ($troops) use ($troopController) {
+        $troops->get('', [$troopController, 'getAllTroops']);
+        $troops->post('', [$troopController, 'createTroop']);
 
-    $app->put('/troops/{id}', [$troopController, 'updateTroop']);
+        $troops->get('/{id}', [$troopController, 'getTroop']);
+        $troops->put('/{id}', [$troopController, 'updateTroop']);
+        $troops->delete('/{id}', [$troopController, 'deleteTroop']);
 
-    $app->delete('/troops/{id}', [$troopController, 'deleteTroop']);
-
-    $app->post('/troops', [$troopController, 'createTroop']);
-
-    $app->get('/troops/{id}/gangs', [$troopController, 'getTroopGangs']);
-
-    $app->post('/troops/{id}/gangs', [$troopController, 'createGang']);
-
-
-    //************************** AUTH ***************************************
-
-    $authController = new AuthController($pdo);
-
-    $app->post('/auth/register', [$authController, 'register']);
-    $app->post('/auth/login', [$authController, 'login']);
+        $troops->get('/{id}/gangs', [$troopController, 'getTroopGangs']);
+        $troops->post('/{id}/gangs', [$troopController, 'createGang']);
+    })->add(new AuthMiddleware()); //adds authorization middleware
 
 
 
-
-
+    //************************* NON-EXISTING **********************************
 
     // Middleware for nonexisting pages - return 404
     $app->add(function (Request $request, RequestHandler $handler): Response {

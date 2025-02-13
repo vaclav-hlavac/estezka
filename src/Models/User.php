@@ -90,7 +90,7 @@ class User extends BaseModel{
 
     public function getPayload(): array {
         return [
-            'id' => $this->id,
+            'id_user' => $this->id,
             'email' => $this->email,
             'exp' => time() + 3600 // Token expires in 1 hour
         ];

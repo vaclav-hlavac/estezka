@@ -34,6 +34,7 @@ return array(
     'Doctrine\\Common\\Lexer\\' => array($vendorDir . '/doctrine/lexer/src'),
     'Doctrine\\Common\\Annotations\\' => array($vendorDir . '/doctrine/annotations/lib/Doctrine/Common/Annotations'),
     'App\\Models\\' => array($baseDir . '/src/Models'),
+    'App\\Middleware\\' => array($baseDir . '/src/Middleware'),
     'App\\Controllers\\' => array($baseDir . '/src/Controllers'),
     'App\\Config\\' => array($baseDir . '/src/Config'),
     'App\\' => array($baseDir . '/src'),

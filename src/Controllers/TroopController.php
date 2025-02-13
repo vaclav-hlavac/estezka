@@ -34,7 +34,7 @@ class TroopController
         $troops = Troop::all($this->pdo);
         $response->getBody()->write(json_encode($troops));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
-    }//todo ostatni metody predelat podle noveho modelu
+    }
 
     /**
      * @OA\Post(
