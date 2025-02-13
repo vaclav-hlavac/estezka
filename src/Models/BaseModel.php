@@ -26,7 +26,6 @@ abstract class BaseModel implements JsonSerializable
         if (!$data) {
             return null;
         }
-        error_log("find: ".json_encode($data));
         return new static($pdo, $data);
     }
 
@@ -59,7 +58,6 @@ abstract class BaseModel implements JsonSerializable
 
     public function getId()
     {
-        error_log("getId: ".$this->id);
         return $this->id;
     }
 

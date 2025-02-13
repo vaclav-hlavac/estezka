@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 use App\Config\Database;
+use App\Controllers\AuthController;
 use Slim\App;
 use Slim\Exception\HttpNotFoundException;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -14,6 +15,9 @@ use App\Controllers\TroopController;
 
 return function (App $app) {
     $pdo = Database::connect();
+
+    //************************* TASK ****************************************
+
 
     $taskController = new TaskController($pdo);
 
@@ -30,10 +34,9 @@ return function (App $app) {
 
 
 
-    //*****************************************************************
+    //************************* TROOP ****************************************
 
     $troopController = new TroopController($pdo);
-    // Získat všechny oddíly
     $app->get('/troops', [$troopController, 'getAllTroops']);
 
     $app->get('/troops/{id}', [$troopController, 'getTroop']);
@@ -48,6 +51,13 @@ return function (App $app) {
 
     $app->post('/troops/{id}/gangs', [$troopController, 'createGang']);
 
+
+    //************************** AUTH ***************************************
+
+    $authController = new AuthController($pdo);
+
+    $app->post('/auth/register', [$authController, 'register']);
+    $app->post('/auth/login', [$authController, 'login']);
 
 
 

@@ -16,7 +16,6 @@ class Troop extends BaseModel{
      * @param array $data associative array with id and name
      */
     public function __construct($pdo, array $data) {
-        error_log("Troop: ".json_encode($data));
 
         if (isset($data['id_troop'])) {
             $data['id'] = $data['id_troop'];
@@ -42,7 +41,7 @@ class Troop extends BaseModel{
     public function jsonSerialize(): mixed
     {
         return [
-            'id' => $this->id,
+            'id_troop' => $this->id,
             'name' => $this->name
         ];
     }

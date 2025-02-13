@@ -61,8 +61,8 @@ class Gang  extends BaseModel
     public function jsonSerialize(): mixed
     {
         return [
-            'id' => $this->id,
-            'troopId' => $this->troopId,
+            'id_gang' => $this->id,
+            'id_troop' => $this->troopId,
             'name' => $this->name
         ];
     }

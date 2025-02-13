@@ -79,7 +79,6 @@ class TroopController
     public function getTroop($request, $response, $args) {
         $troop = Troop::find($this->pdo, $args['id']);
         if ($troop) {
-            error_log(json_encode($troop));
             $response->getBody()->write(json_encode($troop));
             return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
         } else {

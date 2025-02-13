@@ -17,5 +17,8 @@ $response = new ResponseFactory();
 // Načítání rout
 (require __DIR__ . '/../src/Routes/api.php')($app);
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
 // Spuštění aplikace
 $app->run($request, $response);
