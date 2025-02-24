@@ -6,10 +6,18 @@ use PDO;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * Basic ORM from models to my DB.
+ * Uses static $tablename from extended class
+ */
 abstract class BaseModel implements JsonSerializable
 {
     protected $id;
     protected $pdo;
+    /**
+     * @var $tableName string containing name of table, that the extended class uses
+     * should be always renamed by extended class
+     */
     protected static $tableName;
     public function __construct($pdo, $id) {
         $this->pdo = $pdo;
@@ -47,7 +55,7 @@ abstract class BaseModel implements JsonSerializable
         $tableName = static::$tableName;
         $id_name = "id_".$tableName;
 
-        if($this->find($this->id, $this->pdo) == null){
+        if(BaseModel::find($this->id, $this->pdo) == null){
             return false;
         }
         $stmt = $this->pdo->prepare("DELETE FROM $tableName WHERE $id_name = ?");

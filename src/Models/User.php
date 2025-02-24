@@ -14,10 +14,6 @@ class User extends BaseModel{
     public $email;
     public $notifications_enabled;
 
-    /**
-     * @param $pdo
-     * @param array $data associative array with id and name
-     */
     public function __construct($pdo, array $data) {
         if (isset($data['id_user'])) {
             $data['id'] = $data['id_user'];

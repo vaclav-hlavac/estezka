@@ -5,7 +5,8 @@ namespace App\Models;
 
 class Gang  extends BaseModel
 {
-    static $tableName = "gang";
+
+    static protected $tableName = "gang";
     public $name;
     public $troopId;
 

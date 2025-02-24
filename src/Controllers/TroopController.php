@@ -57,6 +57,10 @@ class TroopController
         $troop = new Troop($this->pdo, $data);
         $troop->save();
 
+        $troop = new Troop($this->pdo, $data);
+        $troop->save();
+
+
         $response->getBody()->write(json_encode($troop));
         return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
     }
