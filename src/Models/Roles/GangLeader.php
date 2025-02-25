@@ -51,6 +51,12 @@ class GangLeader extends BaseModel
         ];
     }
 
+    /**
+     * Find all roles of a user by user's ID.
+     * @param $pdo
+     * @param $userId int ID of user, whose roles are searched
+     * @return array Array of GangLeader roles of user.
+     */
     public static function findAllByUserId($pdo, $userId): array
     {
         $tableName = static::$tableName;

@@ -1,19 +1,19 @@
 <?php
 
 namespace App\Models;
-//require_once __DIR__ . '/../autoloader.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 use PDO;
 
 class Task {
-    public $id;
-    public $number;
-    public $name;
-    public $description;
-    public $category;
-    public $tag;
+    private $id;
+    private $number;
+    private $name;
+    private $description;
+    private $category;
+    private $tag;
+    private $troopId;
 
     // Konstruktor pro vytvoření nového úkolu
     public function __construct($number, $name, $description, $category, $tag = null, $id = null) {
@@ -80,7 +80,16 @@ class Task {
             'name' => $this->name,
             'description' => $this->description,
             'category' => $this->category,
-            'tag' => $this->tag
+            'tag' => $this->tag,
+            'id_troop' => $this->troopId
         ];
+    }
+
+    // Uložení custom úkolu do databáze
+    public function saveCustom($pdo) {
+        $this->save($pdo);
+
+        $stmt = $pdo->prepare("UPDATE task SET id_troop = ? WHERE id_task = ?");
+        $stmt->execute([$this->troopId, $this->id]);
     }
 }

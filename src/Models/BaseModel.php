@@ -63,11 +63,8 @@ abstract class BaseModel implements JsonSerializable
         return true;
     }
 
-
     public function getId()
     {
         return $this->id;
     }
-
-
 }
