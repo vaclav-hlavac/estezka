@@ -34,6 +34,7 @@ class TaskController {
             $data['name'],
             $data['description'],
             $data['category'],
+            $data['subcategory'],
             $data['tag'] ?? null
         );
         $task->save($this->pdo);
