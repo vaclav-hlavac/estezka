@@ -47,7 +47,7 @@ abstract class GenericRepository {
     /**
      * Vloží nový záznam do databáze.
      * @param array $data
-     * @return T|null nově vložen7 záznam nebo null v případě nezdaru
+     * @return T|null nově vloženy záznam nebo null v případě nezdaru
      */
     public function insert(array $data): ?object {
         $columns = implode(", ", array_keys($data));

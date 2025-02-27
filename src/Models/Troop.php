@@ -17,8 +17,8 @@ class Troop implements JsonSerializable {
     public function __construct(array $data) {
         $this->requiredArgumentsControl();
 
-        $this->name = $data['name'] ?? null;
-        $this->troopId = $data['id_troop'] ?? null;
+        $this->name = $data['name'];
+        $this->troopId = $data['id_troop'];
     }
 
     public function jsonSerialize(): mixed

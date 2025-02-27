@@ -33,7 +33,7 @@ class TaskProgressRepository extends GenericRepository {
 
     public function saveConfirmedAt(int $id, int $confirmedAt): bool {
         $stmt = $this->pdo->prepare("UPDATE {$this->table} SET confirmed_at = ? WHERE {$this->primaryKey} = ?");
-        return $stmt->execute([$confirmedAt, $id]);
+        return $stmt->execute([$confirmedAt->format('Y-m-d H:i:s'), $id]);
     }
 
     public function saveFilledText(int $id, string $filledText): bool {
