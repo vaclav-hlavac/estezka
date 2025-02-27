@@ -2,70 +2,50 @@
 
 namespace App\Models;
 
+use InvalidArgumentException;
+use JsonSerializable;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-class Gang  extends BaseModel
+class Gang  implements JsonSerializable
 {
-
-    static protected $tableName = "gang";
     public $name;
     public $troopId;
-
+    public $gangId;
 
     /**
      * @param $name
      * @param $troopId
-     * @param $id
+     * @param $gangId
      */
-    public function __construct($pdo, array $data)
+    public function __construct(array $data)
     {
-        if (isset($data['id_gang'])) {
-            $data['id'] = $data['id_gang'];
-        }
-        if (isset($data['id_troop'])) {
-            $data['troopId'] = $data['id_troop'];
-        }
+        $this->requiredArgumentsControl();
 
-        parent::__construct($pdo, $data['id'] ?? null);
-        $this->name = $data['name'] ?? null;
-        $this->troopId = $data['troopId'] ?? null;
-    }
-
-    public function save()
-    {
-        $tableName = static::$tableName;
-        if (isset($this->id)) {
-            // Aktualizace existující družiny
-            $stmt = $this->pdo->prepare("UPDATE $tableName SET name = ?, id_troop = ? WHERE id_gang = ?");
-            $stmt->execute([$this->name, $this->troopId, $this->id]);
-        } else {
-            // Vložení nové družiny
-            $stmt = $this->pdo->prepare("INSERT INTO $tableName (name, id_troop) VALUES (?, ?)");
-            $stmt->execute([$this->name, $this->troopId]);
-            $this->id = $this->pdo->lastInsertId();
-        }
-    }
-
-    public static function getAllByTroopId($pdo, $troopId)
-    {
-        $tableName = static::$tableName;
-        $stmt = $pdo->prepare("SELECT * FROM $tableName WHERE id_troop = ?");
-        $stmt->execute([$troopId]);
-        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        $results = [];
-        foreach ($rows as $row) {
-            $results[] = new static($pdo, $row);
-        }
-        return $results;
+        $this->name = $data['name'];
+        $this->troopId = $data['id_troop'];
+        $this->gangId = $data['id_gang'];
     }
 
     public function jsonSerialize(): mixed
     {
         return [
-            'id_gang' => $this->id,
+            'id_gang' => $this->gangId,
             'id_troop' => $this->troopId,
             'name' => $this->name
         ];
+    }
+
+    private function requiredArgumentsControl(): void
+    {
+        if (empty($data['name'])) {
+            throw new InvalidArgumentException("Missing required field: name");
+        }
+        if (empty($data['id_troop'])) {
+            throw new InvalidArgumentException("Missing required field: id_troop");
+        }
+        if (empty($data['id_gang'])) {
+            throw new InvalidArgumentException("Missing required field: id_gang");
+        }
     }
 }

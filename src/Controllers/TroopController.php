@@ -4,6 +4,7 @@ namespace App\Controllers;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\Models\Gang;
+use App\Repository\TroopRepository;
 use OpenApi\Annotations as OA;
 use App\Models\BaseModel;
 use App\Models\Troop;
@@ -54,8 +55,11 @@ class TroopController
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        $troop = new Troop($this->pdo, $data);
-        $troop->save();
+        $troopRepo = new TroopRepository($this->pdo);
+        $troop = $troopRepo->insert($data);
+
+        /*$troop = new Troop($this->pdo, $data);
+        $troop->save();*/
 
 
         $response->getBody()->write(json_encode($troop));
@@ -78,7 +82,10 @@ class TroopController
      * )
      */
     public function getTroop($request, $response, $args) {
-        $troop = Troop::find($this->pdo, $args['id']);
+        $troopRepo = new TroopRepository($this->pdo);
+        $troop = $troopRepo->findById($args['id']);
+
+        //$troop = Troop::find($this->pdo, $args['id']);
         if ($troop) {
             $response->getBody()->write(json_encode($troop));
             return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
@@ -154,13 +161,16 @@ class TroopController
      * )
      */
     public function deleteTroop($request, $response, $args) {
-        $troop = Troop::find($this->pdo, $args['id']);
+        $troopRepo = new TroopRepository($this->pdo);
+        $troop = $troopRepo->delete($args['id']);
+
+        //$troop = Troop::find($this->pdo, $args['id']);
         if (!$troop) {
             $response->getBody()->write(json_encode(['message' => 'Troop not found']));
             return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
         }
 
-        $troop->delete();
+        //$troop->delete();
         $response->getBody()->write(json_encode(['message' => 'Troop deleted']));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     }

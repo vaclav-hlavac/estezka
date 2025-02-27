@@ -1,48 +1,41 @@
 <?php
 
 namespace App\Models;
+use InvalidArgumentException;
 use JsonSerializable;
-use PDO;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-class Troop extends BaseModel{
-    static protected $tableName = "troop";
+class Troop implements JsonSerializable {
     public $name;
+    public $troopId;
 
 
     /**
-     * @param $pdo
-     * @param array $data associative array with id and name
+     * @param array $data associative array with id_troop and name
      */
-    public function __construct($pdo, array $data) {
+    public function __construct(array $data) {
+        $this->requiredArgumentsControl();
 
-        if (isset($data['id_troop'])) {
-            $data['id'] = $data['id_troop'];
-        }
-        parent::__construct($pdo, $data['id'] ?? null);
         $this->name = $data['name'] ?? null;
-    }
-
-    public function save() {
-        $tableName = static::$tableName;
-        if (isset($this->id)) {
-            // Aktualizace existující jednotky
-            $stmt = $this->pdo->prepare("UPDATE $tableName SET name = ? WHERE id_troop = ?");
-            $stmt->execute([$this->name, $this->id]);
-        } else {
-            // Vložení nové jednotky
-            $stmt = $this->pdo->prepare("INSERT INTO $tableName (name) VALUES (?)");
-            $stmt->execute([$this->name]);
-            $this->id = $this->pdo->lastInsertId();
-        }
+        $this->troopId = $data['id_troop'] ?? null;
     }
 
     public function jsonSerialize(): mixed
     {
         return [
-            'id_troop' => $this->id,
+            'id_troop' => $this->troopId,
             'name' => $this->name
         ];
+    }
+
+    private function requiredArgumentsControl()
+    {
+        if (empty($data['id_troop'])) {
+            throw new InvalidArgumentException("Missing required field: id_troop");
+        }
+        if (empty($data['name'])) {
+            throw new InvalidArgumentException("Missing required field: name");
+        }
     }
 }

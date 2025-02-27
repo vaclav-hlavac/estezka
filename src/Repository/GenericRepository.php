@@ -47,16 +47,16 @@ abstract class GenericRepository {
     /**
      * Vloží nový záznam do databáze.
      * @param array $data
-     * @return int ID nově vloženého záznamu
+     * @return T|null nově vložen7 záznam nebo null v případě nezdaru
      */
-    public function insert(array $data): int {
+    public function insert(array $data): ?object {
         $columns = implode(", ", array_keys($data));
         $placeholders = implode(", ", array_map(fn($key) => ":$key", array_keys($data)));
 
         $stmt = $this->pdo->prepare("INSERT INTO {$this->table} ($columns) VALUES ($placeholders)");
         $stmt->execute($data);
 
-        return (int) $this->pdo->lastInsertId();
+        return $this->findById((int) $this->pdo->lastInsertId());
     }
 
     /**
@@ -89,6 +89,6 @@ abstract class GenericRepository {
      * @return T
      */
     protected function hydrateModel(array $data): object {
-        return new $this->modelClass($data);
+        return new $this->modelClass($this->pdo, $data); //todo az nebude potreba, odstarnit pdo z modelu
     }
 }
