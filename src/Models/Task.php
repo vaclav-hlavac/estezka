@@ -45,14 +45,7 @@ class Task implements JsonSerializable{
             'id_troop' => $this->troopId
         ];
     }
-
-    // Uložení custom úkolu do databáze
-    public function saveCustom($pdo) {
-        $this->save($pdo);
-
-        $stmt = $pdo->prepare("UPDATE task SET id_troop = ? WHERE id_task = ?");
-        $stmt->execute([$this->troopId, $this->id]);
-    }
+    
 
     private function requiredArgumentsControl()
     {
