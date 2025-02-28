@@ -65,12 +65,14 @@ abstract class GenericRepository {
      * @param array $data
      * @return bool
      */
-    public function update(int $id, array $data): bool {
+    public function update(int $id, array $data): ?object {
         $fields = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($data)));
         $data[$this->primaryKey] = $id;
 
         $stmt = $this->pdo->prepare("UPDATE {$this->table} SET $fields WHERE {$this->primaryKey} = :{$this->primaryKey}");
-        return $stmt->execute($data);
+        $stmt->execute($data);
+
+        return $this->findById((int) $this->pdo->lastInsertId());
     }
 
     /**

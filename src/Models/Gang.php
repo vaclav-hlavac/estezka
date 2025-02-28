@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-use InvalidArgumentException;
-use JsonSerializable;
-
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-class Gang  implements JsonSerializable
+class Gang extends BaseModel
 {
     public $name;
-    public $troopId;
-    public $gangId;
+    public $id_troop;
+    public $id_gang;
 
     /**
      * @param $name
@@ -20,32 +17,26 @@ class Gang  implements JsonSerializable
      */
     public function __construct(array $data)
     {
-        $this->requiredArgumentsControl();
+        $notNullArguments = ['id_troop'];
+        $notEmptyArguments = ['name'];
+        $this->requiredArgumentsControl($data, $notNullArguments, $notEmptyArguments);
 
         $this->name = $data['name'];
-        $this->troopId = $data['id_troop'];
-        $this->gangId = $data['id_gang'];
+        $this->id_troop = $data['id_troop'];
+        $this->id_gang = $data['id_gang'] ?? null;
     }
 
     public function jsonSerialize(): mixed
     {
         return [
-            'id_gang' => $this->gangId,
-            'id_troop' => $this->troopId,
+            'id_gang' => $this->id_gang,
+            'id_troop' => $this->id_troop,
             'name' => $this->name
         ];
     }
 
-    private function requiredArgumentsControl(): void
+    public function getId()
     {
-        if (empty($data['name'])) {
-            throw new InvalidArgumentException("Missing required field: name");
-        }
-        if (empty($data['id_troop'])) {
-            throw new InvalidArgumentException("Missing required field: id_troop");
-        }
-        if (empty($data['id_gang'])) {
-            throw new InvalidArgumentException("Missing required field: id_gang");
-        }
+        return $this->id_gang;
     }
 }

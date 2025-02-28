@@ -3,24 +3,21 @@
 namespace App\Models;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-
-use JsonSerializable;
-use PDO;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-
-class Task implements JsonSerializable{
-    private $taskId;
-    private $number;
-    private $name;
-    private $description;
-    private $category;
-    private $subcategory;
-    private $tag;
-    private $troopId;
+class Task extends BaseModel {
+    protected $id_task;
+    protected $number;
+    protected $name;
+    protected $description;
+    protected $category;
+    protected $subcategory;
+    protected $tag;
+    protected $id_troop;
 
 
     public function __construct(array $data) {
-        $this->requiredArgumentsControl();
+        $notNullArguments = ['number'];
+        $notEmptyArguments = ['name', 'description', 'category', 'subcategory'];
+        $this->requiredArgumentsControl($data, $notNullArguments, $notEmptyArguments);
 
         $this->number = $data['number'];
         $this->name = $data['name'];
@@ -28,46 +25,26 @@ class Task implements JsonSerializable{
         $this->category = $data['category'];
         $this->subcategory = $data['subcategory'];
         $this->tag = $data['tag'] ?? null;
-        $this->troopId = $data['id_troop'] ?? null;
-        $this->taskId = $data['id_task'];
+        $this->id_troop = $data['id_troop'] ?? null;
+        $this->id_task = $data['id_task'] ?? null;
     }
 
     public function jsonSerialize(): mixed
     {
         return [
-            'id_task' => $this->taskId,
+            'id_task' => $this->id_task,
             'number' => $this->number,
             'name' => $this->name,
             'description' => $this->description,
             'category' => $this->category,
             'subcategory' => $this->subcategory,
             'tag' => $this->tag,
-            'id_troop' => $this->troopId
+            'id_troop' => $this->id_troop
         ];
     }
-    
 
-    private function requiredArgumentsControl()
+    public function getId()
     {
-        if (empty($data['id_task'])) {
-            throw new InvalidArgumentException("Missing required field: id_task");
-        }
-        if (empty($data['number'])) {
-            throw new InvalidArgumentException("Missing required field: number");
-        }
-        if (empty($data['name'])) {
-            throw new InvalidArgumentException("Missing required field: name");
-        }
-        if (empty($data['description'])) {
-            throw new InvalidArgumentException("Missing required field: description");
-        }
-        if (empty($data['category'])) {
-            throw new InvalidArgumentException("Missing required field: category");
-        }
-        if (empty($data['subcategory'])) {
-            throw new InvalidArgumentException("Missing required field: subcategory");
-        }
+        return $this->id_task;
     }
-
-
 }

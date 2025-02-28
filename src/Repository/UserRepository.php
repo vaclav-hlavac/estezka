@@ -15,13 +15,12 @@ class UserRepository extends GenericRepository {
         parent::__construct($pdo, 'user', 'id_user', User::class);
     }
 
-    public function findAllByNickname($nickname): array
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :nickname");
-        $stmt->execute(['nickname' => $nickname]);
+    public function findByLoginName($loginName): ?User {
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE login_name = ?");
+        $stmt->execute([$loginName]);
 
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return array_map(fn($row) => $this->hydrateModel($row), $results);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $this->hydrateModel($result) : null;
     }
 
     public function findByEmail($email): ?User {
@@ -30,5 +29,17 @@ class UserRepository extends GenericRepository {
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $this->hydrateModel($result) : null;
+    }
+
+    public function emailExists(string $email): bool {
+        return $this->findByEmail($email) !== null;
+    }
+
+    public function insert(array $data): ?User {
+        if (!empty($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+
+        return parent::insert($data);
     }
 }

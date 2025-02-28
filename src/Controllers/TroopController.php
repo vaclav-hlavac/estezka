@@ -6,7 +6,6 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use App\Models\Gang;
 use App\Repository\TroopRepository;
 use OpenApi\Annotations as OA;
-use App\Models\BaseModel;
 use App\Models\Troop;
 use PhpParser\Node\Expr\Array_;
 

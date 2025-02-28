@@ -1,41 +1,36 @@
 <?php
 
 namespace App\Models;
-use InvalidArgumentException;
-use JsonSerializable;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-class Troop implements JsonSerializable {
+class Troop extends BaseModel {
     public $name;
-    public $troopId;
+    public $id_troop;
 
 
     /**
      * @param array $data associative array with id_troop and name
      */
     public function __construct(array $data) {
-        $this->requiredArgumentsControl();
+        $notNullArguments = [];
+        $notEmptyArguments = ['name'];
+        $this->requiredArgumentsControl($data, $notNullArguments, $notEmptyArguments);
 
         $this->name = $data['name'];
-        $this->troopId = $data['id_troop'];
+        $this->id_troop = $data['id_troop'] ?? null;
     }
 
     public function jsonSerialize(): mixed
     {
         return [
-            'id_troop' => $this->troopId,
+            'id_troop' => $this->id_troop,
             'name' => $this->name
         ];
     }
 
-    private function requiredArgumentsControl()
+    public function getId()
     {
-        if (empty($data['id_troop'])) {
-            throw new InvalidArgumentException("Missing required field: id_troop");
-        }
-        if (empty($data['name'])) {
-            throw new InvalidArgumentException("Missing required field: name");
-        }
+        return $this->id_troop;
     }
 }

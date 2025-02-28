@@ -4,7 +4,10 @@ namespace App\Controllers;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\Models\User;
+use App\Repository\UserRepository;
+use Exception;
 use Firebase\JWT\JWT;
+use InvalidArgumentException;
 
 /**
  * @OA\Tag(name="Auth", description="Autorizace uživatelů")
@@ -21,29 +24,36 @@ class AuthController {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
 
-        // Check of required arguments
-        if (!isset($data['email']) || !isset($data['password']) || !isset($data['nickname'])
-            || !isset($data['name']) || !isset($data['surname'])) {
-            $response->getBody()->write(json_encode(['message' => 'Missing information (nickname, name, surname, email or password)']));
+        // lower-case and delete spaces of some arguments
+        $data['login_name'] = trim(strtolower($data['login_name'] ?? ''));
+        $data['email'] = trim(strtolower($data['email'] ?? ''));
+        $data['password'] = trim($data['password'] ?? '');
+
+        // required arguments check
+        try {
+            $user = new User($data);
+        }catch (InvalidArgumentException $e){
+            $response->getBody()->write(json_encode(['message' => $e->getMessage()]));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        // Check unique email
-        if(User::findByEmail($this->pdo, $data['email']) != null){
+        // unique email check
+        $userRepository = new UserRepository($this->pdo);
+        if($userRepository->emailExists($user->email)){
             $response->getBody()->write(json_encode(['message' => 'User with this email already exists.']));
             return $response->withStatus(409)->withHeader('Content-Type', 'application/json');
         }
 
-        // Hashing password
-        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
-        $data['password'] = $hashedPassword;
+        // save to DB
+        try {
+            $savedUser = $userRepository->insert($user->toArray());
+        } catch (Exception $e) {
+            $response->getBody()->write(json_encode(['message' => 'Database error.']));
+            return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
+        }
 
-        // Save to database
-        $user = new User($this->pdo, $data);
-        $user->save();
-
-        // Response
-        $response->getBody()->write(json_encode($user));
+        // response
+        $response->getBody()->write(json_encode($savedUser));
         return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
     }
 
@@ -52,37 +62,35 @@ class AuthController {
         $data = json_decode($rawBody, true);
 
         // Check required fields
-        if (!isset($data['nickname']) || !isset($data['password'])) {
+        if (empty($data['login_name']) || empty($data['password'])) {
             $response->getBody()->write(json_encode(['message' => 'Missing nickname or password']));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
 
-        // Find users by nickname
-        $usersWithNickname = User::findAllByNickname($this->pdo, $data['nickname']);
-        if (count($usersWithNickname) == 0) {
-            $response->getBody()->write(json_encode(['message' => 'Invalid nickname']));
+        // Find user by login and verify
+        $loginName = trim(strtolower($data['login_name']));
+        $userRepository = new UserRepository($this->pdo);
+        $user = $userRepository->findByLoginName($loginName);
+        if ($user == null || !password_verify($data['password'], $user->password)) {
+            $response->getBody()->write(json_encode(['message' => 'Invalid login name or password']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
 
-        // Verify password
-        $loggedUser = null;
-        foreach ($usersWithNickname as $user) {
-            if($user->password_verify($data['password'])){
-                $loggedUser = $user;
-                break;
-            }
-            $response->getBody()->write(json_encode(['message' => 'Invalid nickname or password']));
-            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+        // Check if JWT secret exists
+        $secret = $_ENV['JWT_SECRET'] ?? null;
+        if (!$secret) {
+            return $response->withStatus(500)
+                ->withHeader('Content-Type', 'application/json')
+                ->write(json_encode(['message' => 'Server error: Missing JWT secret']));
         }
 
         // Generating JWT token
-        $payload = $loggedUser->getPayload();
-        $secret = $_ENV['JWT_SECRET'];
+        $payload = $user->getPayload();
         $jwt = JWT::encode($payload, $secret, 'HS256');
 
         // Return response with token
-        $response->getBody()->write(json_encode(['token' => $jwt]));
-        return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+        return $response->withStatus(200)
+            ->withHeader('Content-Type', 'application/json')
+            ->write(json_encode(['token' => $jwt]));
     }
-
 }

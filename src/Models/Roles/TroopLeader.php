@@ -3,20 +3,20 @@
 namespace App\Models\Roles;
 
 use App\Models\BaseModel;
-use InvalidArgumentException;
-use JsonSerializable;
-use PDO;
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 
-class TroopLeader implements JsonSerializable
+class TroopLeader extends BaseModel
 {
+    protected $id_troop_leader;
     public $userId;
     public $troopId;
 
     public function __construct(array $data) {
-        $this->requiredArgumentsControl();
+        $notNullArguments = ['id_user', 'id_troop'];
+        $this->requiredArgumentsControl($data, $notNullArguments);
 
+        $this->id_troop_leader = $data['id_troop_leader'];
         $this->userId = $data['id_user'];
         $this->troopId = $data['id_troop'];
     }
@@ -29,13 +29,8 @@ class TroopLeader implements JsonSerializable
         ];
     }
 
-    private function requiredArgumentsControl(): void
+    public function getId()
     {
-        if (empty($data['id_user'])) {
-            throw new InvalidArgumentException("Missing required field: id_user");
-        }
-        if (empty($data['id_troop'])) {
-            throw new InvalidArgumentException("Missing required field: id_troop");
-        }
+        return $this->id_troop_leader;
     }
 }

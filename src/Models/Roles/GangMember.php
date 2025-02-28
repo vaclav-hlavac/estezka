@@ -2,22 +2,22 @@
 
 namespace App\Models\Roles;
 use App\Models\BaseModel;
-use InvalidArgumentException;
-use JsonSerializable;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-class GangMember implements JsonSerializable
+class GangMember extends BaseModel
 {
+    protected $id_gang_member;
     public $gangId;
     public $userId;
 
     public function __construct(array $data) {
-        $this->requiredArgumentsControl();
+        $notNullArguments = ['id_user', 'id_gang'];
+        $this->requiredArgumentsControl($data, $notNullArguments);
 
+        $this->id_gang_member = $data['id_gang_member'];
         $this->userId = $data['id_user'];
         $this->gangId = $data['id_gang'];
-
     }
 
     public function jsonSerialize(): mixed
@@ -29,13 +29,8 @@ class GangMember implements JsonSerializable
     }
 
 
-    private function requiredArgumentsControl(): void
+    public function getId()
     {
-        if (empty($data['id_user'])) {
-            throw new InvalidArgumentException("Missing required field: id_user");
-        }
-        if (empty($data['id_gang'])) {
-            throw new InvalidArgumentException("Missing required field: id_gang");
-        }
+        return $this->id_gang_member;
     }
 }

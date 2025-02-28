@@ -1,59 +1,45 @@
 <?php
 
 namespace App\Models;
-use InvalidArgumentException;
-use JsonSerializable;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-class Comment implements JsonSerializable
+class Comment extends BaseModel
 {
-    public $userBy;
-    public $userTo;
-    public $postedAt;
+    public $user_by;
+    public $user_to;
+    public $posted_at;
     public $text;
-    public $commentId;
-    public $taskProgressId;
+    public $id_comment;
+    public $id_task_progress;
     public function __construct(array $data)
     {
-        $this->requiredArgumentsControl();
+        $notNullArguments = ['user_by', 'user_to', 'posted_at'];
+        $notEmptyArguments = ['name', 'text'];
+        $this->requiredArgumentsControl($data, $notNullArguments, $notEmptyArguments);
 
-        $this->commentId = $data['id_comment'];
-        $this->taskProgressId = $data['id_task_progress'] ?? null;
-        $this->userBy = $data['user_by'];
-        $this->userTo = $data['user_to'];
-        $this->postedAt = $data['posted_at'];
+        $this->id_comment = $data['id_comment'] ?? null;
+        $this->id_task_progress = $data['id_task_progress'] ?? null;
+        $this->user_by = $data['user_by'];
+        $this->user_to = $data['user_to'];
+        $this->posted_at = $data['posted_at'];
         $this->text = $data['text'];
     }
 
     public function jsonSerialize(): mixed
     {
         return [
-            'id_comment' => $this->commentId,
-            'id_task_progress' => $this->taskProgressId,
-            'user_by' => $this->userBy,
-            'user_to' => $this->userTo,
-            'posted_at' => $this->postedAt,
+            'id_comment' => $this->id_comment,
+            'id_task_progress' => $this->id_task_progress,
+            'user_by' => $this->user_by,
+            'user_to' => $this->user_to,
+            'posted_at' => $this->posted_at,
             'text' => $this->text
         ];
     }
 
-    private function requiredArgumentsControl()
+    public function getId()
     {
-        if (empty($data['id_comment'])) {
-            throw new InvalidArgumentException("Missing required field: id_comment");
-        }
-        if (empty($data['user_by'])) {
-            throw new InvalidArgumentException("Missing required field: user_by");
-        }
-        if (empty($data['user_to'])) {
-            throw new InvalidArgumentException("Missing required field: user_to");
-        }
-        if (empty($data['posted_at'])) {
-            throw new InvalidArgumentException("Missing required field: posted_at");
-        }
-        if (empty($data['text'])) {
-            throw new InvalidArgumentException("Missing required field: text");
-        }
+        return $this->id_comment;
     }
 }
