@@ -8,23 +8,11 @@ use App\Models\Task;
 use App\Repository\TaskRepository;
 use InvalidArgumentException;
 
-class TaskController {
-    private $pdo;
-
+class TaskController extends CRUDController{
     public function __construct($pdo) {
-        $this->pdo = $pdo;
+        parent::__construct($pdo, Task::class, TaskRepository::class );
     }
 
-    public function getAllTasks($request, $response, $args) {
-        $taskRepository = new TaskRepository($this->pdo);
-        try {
-            $tasks = $taskRepository->findAll();
-            return $response->withJson($tasks, 200);
-
-        }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
-        }
-    }
 
     public function getAllGeneralTasks($request, $response, $args) {
         $taskRepository = new TaskRepository($this->pdo);
@@ -48,42 +36,12 @@ class TaskController {
         }
     }
 
-    public function getTask($request, $response, $args) {
-        $taskRepository = new TaskRepository($this->pdo);
-        try {
-            $task = $taskRepository->findById($args['id']);
-        }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+    public function getTroopTask($request, $response, $args) {
+        if($this->troopIdIncluded($request)){
+            return $response->withJson(['message' => 'Id troop not found'], 404);
         }
 
-
-        if ($task) {
-            return $response->withJson($task, 200);
-        } else {
-            return $response->withJson(['message' => 'Task not found'], 404);
-        }
-    }
-
-    public function createTask($request, $response, $args) {
-        $rawBody = $request->getBody()->getContents();
-        $data = json_decode($rawBody, true);
-
-        // required arguments check
-        try {
-            $task = new Task($data);
-        }catch (InvalidArgumentException $e){
-            return $response->withJson($e->getMessage(), $e->getCode());
-        }
-
-        // save + response
-        $taskRepository = new TaskRepository($this->pdo);
-        try {
-            $savedTask = $taskRepository->insert($task->jsonSerialize());
-            return $response->withJson($savedTask, 201);
-
-        }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
-        }
+        return $this->getById($request, $response, $args);
     }
 
     public function createTroopTask($request, $response, $args) {
@@ -91,67 +49,16 @@ class TaskController {
             return $response->withJson(['message' => 'Id troop not found'], 404);
         }
 
-        return $this->createTask($request, $response, $args);
+        return $this->create($request, $response, $args);
     }
 
-    public function updateTask($request, $response, $args) {
-        $rawBody = $request->getBody()->getContents();
-        $data = json_decode($rawBody, true);
-
-        $taskRepository = new TaskRepository($this->pdo);
-        try {
-            // exist check
-            $task = $taskRepository->findById($args['id']);
-            if ($task == null) {
-                return $response->withJson(['message' => 'Task not found'], 404);
-            }
-
-            // set new attributes
-            $task->setAttributes($data);
-
-            // update
-            $updatedTask = $taskRepository->update($task->getId(), $task->jsonSerialize());
-
-        }
-        catch (DatabaseException|InvalidArgumentException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
-        }
-
-        // response
-        if ($updatedTask) {
-            return $response->withJson($updatedTask, 200);
-        } else {
-            return $response->withJson(['message' => 'Task not found'], 404);
-        }
-    }
 
     public function updateTroopTask($request, $response, $args) {
         if($this->troopIdIncluded($request)){
             return $response->withJson(['message' => 'Id troop not found'], 400);
         }
 
-        return $this->updateTask($request, $response, $args);
-    }
-
-    public function deleteTask($request, $response, $args) {
-        // exist check
-        $taskRepository = new TaskRepository($this->pdo);
-        try {
-            $task = $taskRepository->findById($args['id']);
-        }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
-        }
-        if ($task == null) {
-            return $response->withJson(['message' => 'Task not found'], 404);
-        }
-
-        // delete + response
-        try {
-            $taskRepository->delete($task->getId());
-        }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
-        }
-        return $response->withStatus(204);
+        return $this->update($request, $response, $args);
     }
 
     public function deleteTroopTask($request, $response, $args) {
@@ -159,7 +66,7 @@ class TaskController {
             return $response->withJson(['message' => 'Id troop not found'], 404);
         }
 
-        return $this->deleteTask($request, $response, $args);
+        return $this->delete($request, $response, $args);
     }
 
 

@@ -6,9 +6,11 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use App\Exceptions\DatabaseException;
 use App\Models\User;
 use App\Repository\UserRepository;
+use App\Services\AuthService;
 use Exception;
 use Firebase\JWT\JWT;
 use InvalidArgumentException;
+use PDO;
 use Symfony\Component\Console\Exception\MissingInputException;
 
 /**
@@ -16,10 +18,12 @@ use Symfony\Component\Console\Exception\MissingInputException;
  * @OA\PathItem(path="/auth")
  */
 class AuthController {
-    private $pdo;
+    private PDO $pdo;
+    private AuthService $authService;
 
-    public function __construct($pdo) {
+    public function __construct($pdo, $authService) {
         $this->pdo = $pdo;
+        $this->authService = $authService;
     }
 
     public function register($request, $response, $args) {
@@ -57,44 +61,40 @@ class AuthController {
             return $response->withJson(['message' => 'Missing nickname or password'], 400);
         }
 
-        // Find user by login and verify
-        $loginName = trim(strtolower($data['login_name']));
-        $userRepository = new UserRepository($this->pdo);
+        // Authenticate user
         try {
-            $user = $userRepository->findByLoginName($loginName);
+            $user = $this->authenticateUser($data['login_name'], $data['password']);
+            if($user == null){
+                return $response->withJson(['message' => 'Wrong login name or password'], 401);
+            }
         } catch (DatabaseException $e) {
             return $response->withJson(['message' => $e->getMessage()], $e->getCode());
         }
 
-        // authorization
-        if ($user == null || !password_verify($data['password'], $user->password)) {
-            return $response->withJson(['message' => 'Invalid login name or password'], 401);
-        }
-
-        // generate JWT token
-        try {
-            $jwt = $this->generateJWT($user);
-        } catch (MissingInputException $e) {
-            return $response->withJson(['message' => $e->getMessage()], $e->getCode());
-        }
-
         // Return response with token
+        $jwt = $this->authService->generateJWT($user);
         return $response->withJson(['token' => $jwt], 200);
     }
 
+    /**
+     * @param $loginName
+     * @param $password
+     * @return User|null
+     * @throws DatabaseException
+     */
+    private function authenticateUser($loginName, $password): ?User {
+        // Find user by login and verify
+        $loginName = trim(strtolower($loginName));
+        $userRepository = new UserRepository($this->pdo);
+        $user = $userRepository->findByLoginName($loginName);
 
-    //******** PRIVATE ***********************************************************
-    private function generateJWT(User $user): string
-    {
-        // Check if JWT secret exists
-        $secret = $_ENV['JWT_SECRET'] ?? null;
-        if (!$secret) {
-            throw new MissingInputException('Server error: Missing JWT secret', 500);
+
+        // authorization
+        if ($user == null || !password_verify($password, $user->password)) {
+            return null;
         }
-
-        // Generating JWT token
-        $payload = $user->getPayload();
-        return JWT::encode($payload, $secret, 'HS256');
+        return $user;
     }
+
 
 }

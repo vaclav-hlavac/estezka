@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Middleware;
+use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -22,7 +23,7 @@ class AuthMiddleware {
             $decoded = JWT::decode($jwt, new Key($_ENV['JWT_SECRET'], 'HS256'));
             // Adding authorized user to request
             $request = $request->withAttribute('auth_user', $decoded);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->unauthorizedResponse();
         }
 
