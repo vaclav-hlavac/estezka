@@ -29,7 +29,7 @@ abstract class BaseModel implements JsonSerializable
                 $this->$key = $value;
             } else {
                 $className = static::class;
-                throw new InvalidArgumentException("Model {$className} does not have a field: $key");
+                throw new InvalidArgumentException("Model {$className} does not have a field: $key", 400);
             }
         }
     }
