@@ -77,11 +77,7 @@ class TaskController {
     }
 
     public function createTroopTask($request, $response, $args) {
-        $rawBody = $request->getBody()->getContents();
-        $data = json_decode($rawBody, true);
-
-        // control, if troopId is set
-        if(!isset($data['id_troop']) || !filter_var($data['id_troop'], FILTER_VALIDATE_INT)){
+        if($this->troopIdIncluded($request)){
             $response->getBody()->write(json_encode(['message' => 'Id troop not found']));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
@@ -123,11 +119,7 @@ class TaskController {
     }
 
     public function updateTroopTask($request, $response, $args) {
-        $rawBody = $request->getBody()->getContents();
-        $data = json_decode($rawBody, true);
-
-        // control, if troopId is set
-        if(!isset($args['id']) || !filter_var($args['id'], FILTER_VALIDATE_INT)){
+        if($this->troopIdIncluded($request)){
             $response->getBody()->write(json_encode(['message' => 'Id troop not found']));
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         }
@@ -135,6 +127,45 @@ class TaskController {
         return $this->updateTask($request, $response, $args);
     }
 
+    public function deleteTask($request, $response, $args) {
+        // exist check
+        $taskRepository = new TaskRepository($this->pdo);
+        $task = $taskRepository->findById($args['id']);
+        if ($task == null) {
+            $response->getBody()->write(json_encode(['message' => 'Task not found']));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
 
-    // Další metody pro delete
+        // delete + response
+        if ($taskRepository->delete($task->getId())) {
+            return $response->withStatus(204);
+        } else {
+            $response->getBody()->write(json_encode(['message' => 'Database error.']));
+            return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
+        }
+    }
+
+    public function deleteTroopTask($request, $response, $args) {
+        if($this->troopIdIncluded($request)){
+            $response->getBody()->write(json_encode(['message' => 'Id troop not found']));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+
+        return $this->deleteTask($request, $response, $args);
+    }
+
+
+
+    //********** PRIVATE ***********************************************************************
+    private function troopIdIncluded($request): bool
+    {
+        $rawBody = $request->getBody()->getContents();
+        $data = json_decode($rawBody, true);
+
+        // control, if troopId is set
+        if(!isset($data['id_troop']) || !filter_var($data['id_troop'], FILTER_VALIDATE_INT)){
+            return false;
+        }
+        return true;
+    }
 }

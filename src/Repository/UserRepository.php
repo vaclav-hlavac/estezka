@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Exceptions\DatabaseException;
 use App\Models\User;
 use PDO;
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -15,26 +16,56 @@ class UserRepository extends GenericRepository {
         parent::__construct($pdo, 'user', 'id_user', User::class);
     }
 
+    /**
+     * @param $loginName
+     * @return User|null
+     * @throws DatabaseException
+     */
     public function findByLoginName($loginName): ?User {
         $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE login_name = ?");
-        $stmt->execute([$loginName]);
+
+        try{
+            $stmt->execute([$loginName]);
+        } catch (PDOException $e) {
+            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
+        }
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $this->hydrateModel($result) : null;
     }
 
+    /**
+     * @param $email
+     * @return User|null
+     * @throws DatabaseException
+     */
     public function findByEmail($email): ?User {
         $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE email = ?");
-        $stmt->execute([$email]);
+
+        try{
+            $stmt->execute([$email]);
+        } catch (PDOException $e) {
+            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
+        }
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $this->hydrateModel($result) : null;
     }
 
+    /**
+     * @param string $email
+     * @return bool
+     * @throws DatabaseException
+     */
     public function emailExists(string $email): bool {
-        return $this->findByEmail($email) !== null;
+        return $this->findByEmail($email) != null;
     }
 
+    /**
+     * @param array $data
+     * @return User|null
+     * @throws DatabaseException
+     */
     public function insert(array $data): ?User {
         if (!empty($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);

@@ -31,7 +31,8 @@ class TroopController
      * )
      */
     public function getAllTroops($request, $response, $args) {
-        $troops = Troop::all($this->pdo);
+        $troopRepository = new TroopRepository($this->pdo);
+        $troops = $troopRepository->findAll();
         $response->getBody()->write(json_encode($troops));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
     }
