@@ -73,4 +73,18 @@ class GangLeaderRepository extends GenericRepository
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $this->hydrateModel($result) : null;
     }
+
+    /**
+     * @param int $userId
+     * @param int $gangId
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function isUserGangLeaderOfGang(int $userId, int $gangId): bool
+    {
+        if($this->findByUserAndGangId($userId, $gangId) == null) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Exceptions\DatabaseException;
 use App\Models\BaseModel;
 use App\Repository\GenericRepository;
+use App\Utils\JsonResponseHelper;
 use InvalidArgumentException;
 use PDO;
 
@@ -38,10 +39,9 @@ abstract class CRUDController
     public function getAll($request, $response, $args) {
         try {
             $foundObjects = $this->repository->findAll();
-            return $response->withJson($foundObjects, 200);
-
+            return JsonResponseHelper::jsonResponse($foundObjects, 200, $response);
         }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
     }
 
@@ -49,14 +49,14 @@ abstract class CRUDController
         try {
             $foundObject = $this->repository->findById($args['id']);
         }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
 
 
         if ($foundObject) {
-            return $response->withJson($foundObject, 200);
+            return JsonResponseHelper::jsonResponse($foundObject, 200, $response);
         } else {
-            return $response->withJson(['message' => 'Object not found'], 404);
+            return JsonResponseHelper::jsonResponse('Object not found', 404, $response);
         }
     }
 
@@ -69,16 +69,16 @@ abstract class CRUDController
             /** @var TModel $object */
             $object = new $this->modelClass($data);
         }catch (InvalidArgumentException $e){
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
 
         // save + response
         try {
             $savedObject = $this->repository->insert($object->jsonSerialize()); //todo toArray??
-            return $response->withJson($savedObject, 201);
+            return JsonResponseHelper::jsonResponse($savedObject, 201, $response);
 
         }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
     }
 
@@ -90,7 +90,7 @@ abstract class CRUDController
             // exist check
             $foundObject = $this->repository->findById($args['id']);
             if ($foundObject == null) {
-                return $response->withJson(['message' => 'Object not found'], 404);
+                return JsonResponseHelper::jsonResponse('Object not found', 404, $response);
             }
 
             // set new attributes
@@ -101,14 +101,14 @@ abstract class CRUDController
 
         }
         catch (DatabaseException|InvalidArgumentException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
 
         // response
         if ($updatedObject) {
-            return $response->withJson($updatedObject, 200);
+            return JsonResponseHelper::jsonResponse($updatedObject, 200, $response);
         } else {
-            return $response->withJson(['message' => 'Object not found'], 404);
+            return JsonResponseHelper::jsonResponse('Object not found', 404, $response);
         }
     }
 
@@ -117,17 +117,17 @@ abstract class CRUDController
         try {
             $foundObject = $this->repository->findById($args['id']);
         }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
         if ($foundObject == null) {
-            return $response->withJson(['message' => 'Object not found'], 404);
+            return JsonResponseHelper::jsonResponse('Object not found', 404, $response);
         }
 
         // delete + response
         try {
             $this->repository->delete($foundObject->getId());
         }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
         return $response->withStatus(204);
     }

@@ -74,4 +74,47 @@ class TroopLeaderRepository extends GenericRepository
         return $result ? $this->hydrateModel($result) : null;
     }
 
+    /**
+     * @param int $userId
+     * @param int $troopId
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function isUserTroopLeaderOfTroop(int $userId, int $troopId):bool
+    {
+        if($this->findByUserAndTroopId($userId, $troopId) == null) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check, if user is troopLeader and if in its troop is group with this gangID
+     *
+     * @param int $userId
+     * @param int $gangId
+     * @return bool
+     * @throws DatabaseException
+     */
+    public function isUserTroopLeaderWithGang(int $userId, int $gangId):bool
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT EXISTS(
+                            select 1 
+                            from {$this->table} 
+                            join e_stezka.gang g on {$this->table}.id_troop = g.id_troop 
+                            where g.id_gang = ? and id_user = ?
+                        ) AS exists_result"
+        );
+
+        try{
+            $stmt->execute([$gangId, $userId]);
+            $result = $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
+        }
+
+        return (bool) $result;
+    }
+
 }
