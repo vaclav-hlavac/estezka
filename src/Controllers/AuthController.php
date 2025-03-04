@@ -7,6 +7,7 @@ use App\Exceptions\DatabaseException;
 use App\Models\User;
 use App\Repository\UserRepository;
 use App\Services\AuthService;
+use App\Utils\JsonResponseHelper;
 use Exception;
 use Firebase\JWT\JWT;
 use InvalidArgumentException;
@@ -39,16 +40,18 @@ class AuthController {
             // required arguments check
             $user = new User($data);
 
-            // unique email check
+            // unique email and login_name check
             $userRepository = new UserRepository($this->pdo);
-            $userRepository->emailExists($user->email);
+            if($userRepository->emailExists($user->email) || $userRepository->loginNameExists($user->login_name)) {
+                return JsonResponseHelper::jsonResponse('Login name or email already exists.', 409, $response);
+            }
 
             // save to DB + response
             $savedUser = $userRepository->insert($user->toArray());
-            return $response->withJson($savedUser, 201);
+            return JsonResponseHelper::jsonResponse($savedUser, 201, $response);
 
         } catch (DatabaseException $e) {
-            return $response->withJson(['message' => $e->getMessage()], $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
     }
 
@@ -58,22 +61,22 @@ class AuthController {
 
         // Check required fields
         if (empty($data['login_name']) || empty($data['password'])) {
-            return $response->withJson(['message' => 'Missing nickname or password'], 400);
+            return JsonResponseHelper::jsonResponse('Missing nickname or password', 400, $response);
         }
 
         // Authenticate user
         try {
             $user = $this->authenticateUser($data['login_name'], $data['password']);
             if($user == null){
-                return $response->withJson(['message' => 'Wrong login name or password'], 401);
+                return JsonResponseHelper::jsonResponse('Wrong login name or password', 401, $response);
             }
         } catch (DatabaseException $e) {
-            return $response->withJson(['message' => $e->getMessage()], $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
 
         // Return response with token
         $jwt = $this->authService->generateJWT($user);
-        return $response->withJson(['token' => $jwt], 200);
+        return JsonResponseHelper::jsonResponse(['token' => $jwt], 200, $response);
     }
 
     /**

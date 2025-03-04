@@ -1,5 +1,4 @@
 <?php
-//require_once __DIR__ . '/../autoloader.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 
@@ -8,6 +7,9 @@ use App\Controllers\AuthController;
 use App\Controllers\GangController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
+use App\Middleware\GangAuthorizationMiddleware;
+use App\Models\Troop;
+use App\Services\AccessService;
 use App\Services\AuthService;
 use Slim\App;
 use Slim\Exception\HttpNotFoundException;
@@ -20,6 +22,7 @@ use App\Controllers\TroopController;
 return function (App $app) {
     $pdo = Database::connect();
     $authService = new AuthService();
+
     //************************************************************************
     //************************* PUBLIC ROUTES ********************************
     //************************************************************************
@@ -37,10 +40,9 @@ return function (App $app) {
     $taskController = new TaskController($pdo);
 
     $app->group('/tasks', function ($tasks) use ($taskController) {
-        $tasks->get('', [$taskController, 'getAllTasks']);
-        //$tasks->post('', [$taskController, 'createTask']);
+        $tasks->get('', [$taskController, 'getAllGeneralTasks']);
 
-        $tasks->get('/{id}', [$taskController, 'getTask']);
+        $tasks->get('/{id}', [$taskController, 'getById']);
     });
 
     //************************* USER ****************************************
@@ -48,9 +50,9 @@ return function (App $app) {
     $userController = new UserController($pdo);
 
     $app->group('/users', function ($tasks) use ($userController) {
-        $tasks->get('', [$userController, 'getAllUsers']);
+        $tasks->get('', [$userController, 'getAll']);
 
-        $tasks->get('/{id}', [$userController, 'getTask']);
+        $tasks->get('/{id}', [$userController, 'getById']);
     });
 
     //************************************************************************
@@ -62,12 +64,12 @@ return function (App $app) {
     $troopController = new TroopController($pdo);
 
     $app->group('/troops', function ($troops) use ($troopController) {
-        $troops->get('', [$troopController, 'getAllTroops']);
-        $troops->post('', [$troopController, 'createTroop']);
+        $troops->get('', [$troopController, 'getAll']);
+        $troops->post('', [$troopController, 'create']);
 
-        $troops->get('/{id}', [$troopController, 'getTroop']);
-        $troops->put('/{id}', [$troopController, 'updateTroop']);
-        $troops->delete('/{id}', [$troopController, 'deleteTroop']);
+        $troops->get('/{id}', [$troopController, 'getById']);
+        $troops->put('/{id}', [$troopController, 'update']);
+        $troops->delete('/{id}', [$troopController, 'delete']);
 
         $troops->get('/{id}/gangs', [$troopController, 'getTroopGangs']);
         $troops->post('/{id}/gangs', [$troopController, 'createGang']);
@@ -76,10 +78,11 @@ return function (App $app) {
 
     //************************* TROOP - GANGS ****************************************
     $gangController = new GangController($pdo);
+    //$accesService = new AccessService(); todo
 
     $app->group('/troops', function ($troops) use ($gangController) {
-        $troops->get('/{troop_id}/gangs/{id}/members', [$gangController, 'getGangMembers']);
-        $troops->get('/{troop_id}/gangs/{id}/members', [$gangController, 'getGangMembers']);
+        $troops->get('/{id_troop}/gangs/{id_gang}/members', [$gangController, 'getGangMembers']);
+        $troops->post('/{id_troop}/gangs/{id_gang}/members', [$gangController, 'addGangMember']);
 
     })->add(new AuthMiddleware()); //adds authorization middleware
 
@@ -96,11 +99,11 @@ return function (App $app) {
     $gangController = new GangController($pdo);
 
     $app->group('/gangs', function ($gangs) use ($gangController) {
-        $gangs->patch('/{id}', [$gangController, 'updateGang']);
-        $gangs->delete('/{id}', [$gangController, 'deleteGang']);
-        $gangs->delete('/{id}/members', [$gangController, 'getGangMembers']);
+        $gangs->patch('/{id}', [$gangController, 'update']);
+        $gangs->delete('/{id}', [$gangController, 'delete']);
+        $gangs->delete('/{id_gang}/members/{id_user}', [$gangController, 'getGangMembers']);
 
-    })->add(new AuthMiddleware());
+    })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
 
 
 

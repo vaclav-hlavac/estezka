@@ -122,6 +122,6 @@ abstract class GenericRepository {
      * @return object
      */
     protected function hydrateModel(array $data): object {
-        return new $this->modelClass($data); //todo az nebude potreba, odstarnit pdo z modelu
+        return new $this->modelClass($data);
     }
 }

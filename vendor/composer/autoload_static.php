@@ -16,6 +16,7 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        'b33e3d135e5d9e47d845c576147bda89' => __DIR__ . '/..' . '/php-di/php-di/src/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -48,6 +49,14 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         array (
             'OpenApi\\' => 8,
         ),
+        'L' => 
+        array (
+            'Laravel\\SerializableClosure\\' => 28,
+        ),
+        'I' => 
+        array (
+            'Invoker\\' => 8,
+        ),
         'G' => 
         array (
             'GrahamCampbell\\ResultType\\' => 26,
@@ -63,6 +72,7 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
             'Dotenv\\' => 7,
             'Doctrine\\Common\\Lexer\\' => 22,
             'Doctrine\\Common\\Annotations\\' => 28,
+            'DI\\' => 3,
         ),
         'A' => 
         array (
@@ -157,6 +167,14 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         array (
             0 => __DIR__ . '/..' . '/zircote/swagger-php/src',
         ),
+        'Laravel\\SerializableClosure\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laravel/serializable-closure/src',
+        ),
+        'Invoker\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-di/invoker/src',
+        ),
         'GrahamCampbell\\ResultType\\' => 
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
@@ -184,6 +202,10 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         'Doctrine\\Common\\Annotations\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations',
+        ),
+        'DI\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-di/php-di/src',
         ),
         'App\\Models\\' => 
         array (

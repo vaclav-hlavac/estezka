@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use App\Exceptions\DatabaseException;
 use App\Models\Task;
 use App\Repository\TaskRepository;
+use App\Utils\JsonResponseHelper;
 use InvalidArgumentException;
 
 class TaskController extends CRUDController{
@@ -18,10 +19,9 @@ class TaskController extends CRUDController{
         $taskRepository = new TaskRepository($this->pdo);
         try {
             $tasks = $taskRepository->findAllGeneralTasks();
-            return $response->withJson($tasks, 200);
-
+            return JsonResponseHelper::jsonResponse($tasks, 200, $response);
         }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
     }
 
@@ -29,16 +29,16 @@ class TaskController extends CRUDController{
         $taskRepository = new TaskRepository($this->pdo);
         try {
             $tasks = $taskRepository->findAllGeneralTasksByPathLevel($args['pathLevel']);
-            return $response->withJson($tasks, 200);
+            return JsonResponseHelper::jsonResponse($tasks, 200, $response);
 
         }catch (DatabaseException $e) {
-            return $response->withJson($e->getMessage(), $e->getCode());
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
     }
 
     public function getTroopTask($request, $response, $args) {
         if($this->troopIdIncluded($request)){
-            return $response->withJson(['message' => 'Id troop not found'], 404);
+            return JsonResponseHelper::jsonResponse('Id troop not found', 404, $response);
         }
 
         return $this->getById($request, $response, $args);
@@ -46,7 +46,7 @@ class TaskController extends CRUDController{
 
     public function createTroopTask($request, $response, $args) {
         if($this->troopIdIncluded($request)){
-            return $response->withJson(['message' => 'Id troop not found'], 404);
+            return JsonResponseHelper::jsonResponse('Id troop not found', 404, $response);
         }
 
         return $this->create($request, $response, $args);
@@ -55,7 +55,7 @@ class TaskController extends CRUDController{
 
     public function updateTroopTask($request, $response, $args) {
         if($this->troopIdIncluded($request)){
-            return $response->withJson(['message' => 'Id troop not found'], 400);
+            return JsonResponseHelper::jsonResponse('Id troop not found', 404, $response);
         }
 
         return $this->update($request, $response, $args);
@@ -63,7 +63,7 @@ class TaskController extends CRUDController{
 
     public function deleteTroopTask($request, $response, $args) {
         if($this->troopIdIncluded($request)){
-            return $response->withJson(['message' => 'Id troop not found'], 404);
+            return JsonResponseHelper::jsonResponse('Id troop not found', 404, $response);
         }
 
         return $this->delete($request, $response, $args);

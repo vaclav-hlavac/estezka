@@ -12,9 +12,6 @@ $app = AppFactory::create();
 // Načítání rout
 (require __DIR__ . '/../src/Routes/api.php')($app);
 
-/*// 🔹 Načtení middleware
-(require __DIR__ . '/../src/Middleware.php')($app);*/
-
 // Spuštění aplikace
 $app->run();
 

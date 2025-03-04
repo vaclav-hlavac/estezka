@@ -12,7 +12,7 @@ class GangController extends CRUDController
     }
 
     public function getGangMembers(){
-
+//todo
     }
 
 }
