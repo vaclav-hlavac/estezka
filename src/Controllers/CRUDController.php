@@ -5,8 +5,10 @@ use App\Exceptions\DatabaseException;
 use App\Models\BaseModel;
 use App\Repository\GenericRepository;
 use App\Utils\JsonResponseHelper;
+use DI\Container;
 use InvalidArgumentException;
 use PDO;
+use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 

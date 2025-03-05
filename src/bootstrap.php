@@ -1,6 +1,7 @@
 <?php
 
 use App\Config\Database;
+use App\Middleware\ErrorHandlerMiddleware;
 use App\Repository\CommentRepository;
 use App\Repository\GangRepository;
 use App\Repository\TaskProgressRepository;
@@ -9,8 +10,11 @@ use App\Repository\TroopRepository;
 use App\Repository\UserRepository;
 use App\Services\AuthService;
 use DI\Container;
+use Monolog\Level;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 use Psr\Container\ContainerInterface;
-use Slim\Factory\AppFactory;
+use Psr\Log\LoggerInterface;
 use App\Services\AccessService;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -47,4 +51,19 @@ $container->set(AccessService::class, fn(ContainerInterface $c) => new AccessSer
 
 $container->set(AuthService::class, fn(ContainerInterface $c) => new AuthService());
 
-AppFactory::setContainer($container);
+
+// LOGGER
+$container->set(LoggerInterface::class, function () {
+    $logger = new Logger('app');
+
+    // Logování do konzole (stdout)
+    $logger->pushHandler(new StreamHandler('php://stdout', Level::Debug));
+
+    return $logger;
+});
+
+// ERROR HANDLER
+$container->set(ErrorHandlerMiddleware::class, fn(ContainerInterface $c) => new ErrorHandlerMiddleware($c->get(LoggerInterface::class)));
+
+return $container;
+

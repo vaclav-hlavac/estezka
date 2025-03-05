@@ -3,7 +3,7 @@
         'name' => 'abe/estezka',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '2232f1131c10e39ac074c5cb1052b8cf644c975e',
+        'reference' => '8c157aa1dda89d35e29b0877bb282084d42492f7',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'abe/estezka' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '2232f1131c10e39ac074c5cb1052b8cf644c975e',
+            'reference' => '8c157aa1dda89d35e29b0877bb282084d42492f7',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -70,6 +70,15 @@
             'reference' => 'f379c13663245f7aa4512a7869f62eb14095f23f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../laravel/serializable-closure',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'monolog/monolog' => array(
+            'pretty_version' => '3.8.1',
+            'version' => '3.8.1.0',
+            'reference' => 'aef6ee73a77a66e404dd6540934a9ef1b3c855b4',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../monolog/monolog',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -203,6 +212,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0|2.0|3.0',
+                1 => '3.0.0',
             ),
         ),
         'ralouphie/getallheaders' => array(

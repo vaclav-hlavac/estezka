@@ -49,6 +49,10 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         array (
             'OpenApi\\' => 8,
         ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
+        ),
         'L' => 
         array (
             'Laravel\\SerializableClosure\\' => 28,
@@ -166,6 +170,10 @@ class ComposerStaticInit2e5946d93122e40e1df5266d6657dad2
         'OpenApi\\' => 
         array (
             0 => __DIR__ . '/..' . '/zircote/swagger-php/src',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'Laravel\\SerializableClosure\\' => 
         array (
