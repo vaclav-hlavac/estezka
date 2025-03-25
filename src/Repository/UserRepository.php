@@ -73,15 +73,4 @@ class UserRepository extends GenericRepository {
 
         return parent::insert($data);
     }
-
-    /**
-     * @param mixed $login_name
-     * @return bool
-     * @throws DatabaseException
-     */
-    public function loginNameExists(mixed $login_name): bool
-    {
-        return $this->findByLoginName($login_name) != null;
-
-    }
 }

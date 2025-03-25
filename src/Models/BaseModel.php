@@ -8,6 +8,13 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 abstract class BaseModel implements JsonSerializable
 {
+    /**
+     * @param $data
+     * @param $notNullArguments
+     * @param $notEmptyArguments
+     * @throws InvalidArgumentException
+     * @return void
+     */
     protected function requiredArgumentsControl($data, $notNullArguments, $notEmptyArguments = []): void
     {
         foreach ($notNullArguments as $notNullArgument) {

@@ -33,6 +33,13 @@ return function (App $app) {
     $app->group('/auth', function ($auth) use ($authController) {
         $auth->post('/register', [$authController, 'register']);
         $auth->post('/login', [$authController, 'login']);
+        $auth->post('/refresh', [$authController, 'refresh']);
+    });
+
+    $publicGangController = new GangController($pdo);
+
+    $app->group('/patrol', function ($auth) use ($publicGangController) {
+        $auth->post('/check-invite', [$publicGangController, 'checkInviteCode']);
     });
 
 
@@ -67,9 +74,13 @@ return function (App $app) {
         $troops->get('', [$troopController, 'getAll']);
         $troops->post('', [$troopController, 'create']);
 
+
         $troops->get('/{id}', [$troopController, 'getById']);
         $troops->put('/{id}', [$troopController, 'update']);
         $troops->delete('/{id}', [$troopController, 'delete']);
+
+        $troops->get('/{id}/members', [$troopController, 'getTroopMembers']);
+
 
         $troops->get('/{id}/gangs', [$troopController, 'getTroopGangs']);
         $troops->post('/{id}/gangs', [$troopController, 'createGang']);
