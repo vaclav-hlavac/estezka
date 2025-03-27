@@ -36,7 +36,7 @@ class GangRepository extends GenericRepository {
         return array_map(fn($row) => $this->hydrateModel($row), $results);
     }
 
-    public function findGangByInviteCode(int $invite_code): ?Gang {
+    public function findGangByInviteCode(string $invite_code): ?Gang {
         $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE invite_code = :invite_code");
         try {
             $stmt->execute(['invite_code' => $invite_code]);

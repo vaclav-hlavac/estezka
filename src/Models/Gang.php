@@ -24,7 +24,7 @@ class Gang extends BaseModel
         $this->name = $data['name'];
         $this->id_troop = $data['id_troop'];
         $this->id_gang = $data['id_gang'] ?? null;
-        $this->invite_code = bin2hex(random_bytes(32));
+        $this->invite_code = bin2hex(random_bytes(5));
     }
 
     public function jsonSerialize(): mixed

@@ -7,30 +7,28 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 class GangMember extends BaseModel
 {
-    protected $id_gang_member;
-    public $gangId;
-    public $userId;
+    public int $id_gang;
+    public int $id_user;
 
     public function __construct(array $data) {
         $notNullArguments = ['id_user', 'id_gang'];
         $this->requiredArgumentsControl($data, $notNullArguments);
 
-        $this->id_gang_member = $data['id_gang_member'];
-        $this->userId = $data['id_user'];
-        $this->gangId = $data['id_gang'];
+        $this->id_user = $data['id_user'];
+        $this->id_gang = $data['id_gang'];
     }
 
     public function jsonSerialize(): mixed
     {
         return [
-            'id_user' => $this->userId,
-            'id_gang' => $this->gangId
+            'id_user' => $this->id_user,
+            'id_gang' => $this->id_gang
         ];
     }
 
 
     public function getId()
     {
-        return $this->id_gang_member;
+        return $this->id_user;
     }
 }

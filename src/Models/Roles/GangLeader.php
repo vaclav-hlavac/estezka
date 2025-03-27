@@ -17,7 +17,7 @@ class GangLeader extends BaseModel
         $notNullArguments = ['id_user', 'id_gang'];
         $this->requiredArgumentsControl($data, $notNullArguments);
 
-        $this->id_gang_leader = $data['id_gang_leader'];
+        $this->id_gang_leader = $data['id_gang_leader'] ?? null;
         $this->id_user = $data['id_user'];
         $this->id_gang = $data['id_gang'];
     }

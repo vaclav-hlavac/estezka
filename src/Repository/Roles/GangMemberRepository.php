@@ -32,5 +32,4 @@ class GangMemberRepository extends GenericRepository
 
         return array_map(fn($row) => $this->hydrateModel($row), $results);
     }
-
 }

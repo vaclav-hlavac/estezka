@@ -19,13 +19,13 @@ abstract class BaseModel implements JsonSerializable
     {
         foreach ($notNullArguments as $notNullArgument) {
             if (!isset($data[$notNullArgument])) {
-                throw new InvalidArgumentException("Missing required field: $notNullArgument");
+                throw new InvalidArgumentException("Missing required field: $notNullArgument", code: 400);
             }
         }
 
         foreach ($notEmptyArguments as $notEmptyArgument) {
             if (empty($data[$notEmptyArgument])) {
-                throw new InvalidArgumentException("Missing required field: $notEmptyArgument");
+                throw new InvalidArgumentException("Missing required field: $notEmptyArgument", code: 400);
             }
         }
     }

@@ -76,7 +76,9 @@ abstract class GenericRepository {
             throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
         }
 
-        return $this->findById((int) $this->pdo->lastInsertId());
+        $insertedId = $data[$this->primaryKey] ?? (int) $this->pdo->lastInsertId();
+
+        return $this->findById($insertedId);
     }
 
     /**

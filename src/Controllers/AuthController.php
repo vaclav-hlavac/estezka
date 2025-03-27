@@ -23,6 +23,7 @@ use Firebase\JWT\JWT;
 use InvalidArgumentException;
 use PDO;
 use Random\RandomException;
+use Slim\Logger;
 use Symfony\Component\Console\Exception\MissingInputException;
 
 /**
@@ -42,6 +43,8 @@ class AuthController {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
 
+        error_log(print_r($data, true));
+
         // lower-case and delete spaces of some arguments
         $data['email'] = trim(strtolower($data['email'] ?? ''));
         $data['password'] = trim($data['password'] ?? '');
@@ -58,9 +61,11 @@ class AuthController {
 
             // unique email check
             $userRepository = new UserRepository($this->pdo);
+
             if($userRepository->emailExists($user->email)) {
                 return JsonResponseHelper::jsonResponse('Email already exists.', 409, $response);
             }
+
 
             // Save to DB + response
             $savedUser = $userRepository->insert($user->toDatabase());
@@ -79,7 +84,8 @@ class AuthController {
                     return JsonResponseHelper::jsonResponse('Wrong invite code', 404, $response);
                 }
             }
-        } catch (DatabaseException $e) {
+        } catch (Exception $e) {
+            error_log("jdu deletovat!!!" . $user->jsonSerialize());
             $userRepository->delete($user->getId());
             return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
@@ -206,7 +212,10 @@ class AuthController {
 
         // Setting TroopLeader role
         $troopLeaderRepository = new TroopLeaderRepository($this->pdo);
-        $troopLeader = new TroopLeader([$savedUser->getId(), $data['id_troop']]);
+        $troopLeader = new TroopLeader([
+            "id_user" => $savedUser->getId(),
+            "id_troop" => $data['id_troop']
+        ]);
         $troopLeaderRepository->insert($troopLeader->jsonSerialize());
     }
 
@@ -228,8 +237,13 @@ class AuthController {
 
         // Setting GangMember role
         $gangMemberRepository = new GangMemberRepository($this->pdo);
-        $gangMember = new GangMember([$savedUser->getId(), $gang->getId()]);
+        $gangMember = new GangMember([
+            "id_user" => $savedUser->getId(),
+            "id_gang" => $gang->getId()
+        ]);
+
         $gangMemberRepository->insert($gangMember->jsonSerialize());
+
         return true;
     }
 
