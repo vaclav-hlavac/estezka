@@ -5,12 +5,12 @@ namespace App\Models;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Troop extends BaseModel {
-    public $name;
-    public $id_troop;
+    public string $name;
+    public ?int $id_troop;
 
 
     /**
-     * @param array $data associative array with id_troop and name
+     * @param array $data associative array with name and (optionally) id_troop
      */
     public function __construct(array $data) {
         $notNullArguments = [];
@@ -23,10 +23,13 @@ class Troop extends BaseModel {
 
     public function jsonSerialize(): mixed
     {
-        return [
-            'id_troop' => $this->id_troop,
-            'name' => $this->name
+        $data = [
+            'name' => $this->name,
         ];
+
+        if ($this->id_troop != null) { $data['id_troop'] = $this->id_troop;}
+
+        return $data;
     }
 
     public function getId()

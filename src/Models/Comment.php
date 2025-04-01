@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use DateTime;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Comment extends BaseModel
 {
-    public $user_by;
-    public $user_to;
-    public $posted_at;
-    public $text;
-    public $id_comment;
-    public $id_task_progress;
+    public int $user_by;
+    public int $user_to;
+    public DateTime $posted_at;
+    public string $text;
+    public ?int $id_comment;
+    public ?int $id_task_progress;
     public function __construct(array $data)
     {
         $notNullArguments = ['user_by', 'user_to', 'posted_at'];
@@ -28,7 +30,7 @@ class Comment extends BaseModel
 
     public function jsonSerialize(): mixed
     {
-        return [
+        $data =  [
             'id_comment' => $this->id_comment,
             'id_task_progress' => $this->id_task_progress,
             'user_by' => $this->user_by,
@@ -36,6 +38,11 @@ class Comment extends BaseModel
             'posted_at' => $this->posted_at,
             'text' => $this->text
         ];
+
+        if ($this->id_comment != null) { $data['id_comment'] = $this->id_comment;}
+        if ($this->id_task_progress != null) { $data['id_task_progress'] = $this->id_task_progress;}
+
+        return $data;
     }
 
     public function getId()

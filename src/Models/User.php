@@ -8,13 +8,13 @@ use Symfony\Component\Console\Color;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class User extends BaseModel {
-    public $id_user;
-    public $nickname;
-    public $name;
-    public $surname;
-    public $password;
-    public $email;
-    public $notifications_enabled;
+    public ?int $id_user;
+    public string $nickname;
+    public string $name;
+    public string $surname;
+    public string $password;
+    public string $email;
+    public bool $notifications_enabled;
     public ?string $gang_name;
     public ?String $gang_color;
     public ?int $completed_tasks;
@@ -41,21 +41,8 @@ class User extends BaseModel {
     }
 
     public function toDatabase(): array {
-        return [
-            'id_user' => $this->id_user,
-            'nickname' => $this->nickname,
-            'name' => $this->name,
-            'surname' => $this->surname,
-            'email' => $this->email,
-            'password' => $this->password,
-            'notifications_enabled' => $this->notifications_enabled
-        ];
-    }
-
-    public function jsonSerialize(): mixed
-    {
         $data = [
-            'id_user' => $this->id_user,
+            'password' => $this->password,
             'nickname' => $this->nickname,
             'name' => $this->name,
             'surname' => $this->surname,
@@ -63,6 +50,27 @@ class User extends BaseModel {
             'notifications_enabled' => $this->notifications_enabled,
         ];
 
+        if ($this->id_user != null) { $data['id_user'] = $this->id_user;}
+        if ($this->gang_name != null) { $data['patrol_name'] = $this->gang_name;}
+        if ($this->gang_color != null) { $data['color'] = $this->gang_color;}
+        if ($this->completed_tasks != null) { $data['completed_tasks'] = $this->completed_tasks;}
+        if ($this->total_tasks != null) { $data['total_tasks'] = $this->total_tasks;}
+        if ($this->activePathLevel != null) { $data['active_path_level'] = $this->activePathLevel;}
+
+        return $data;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        $data = [
+            'nickname' => $this->nickname,
+            'name' => $this->name,
+            'surname' => $this->surname,
+            'email' => $this->email,
+            'notifications_enabled' => $this->notifications_enabled,
+        ];
+
+        if ($this->id_user != null) { $data['id_user'] = $this->id_user;}
         if ($this->gang_name != null) { $data['patrol_name'] = $this->gang_name;}
         if ($this->gang_color != null) { $data['color'] = $this->gang_color;}
         if ($this->completed_tasks != null) { $data['completed_tasks'] = $this->completed_tasks;}

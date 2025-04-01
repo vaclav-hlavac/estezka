@@ -8,9 +8,9 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 class TroopLeader extends BaseModel
 {
-    protected $id_troop_leader;
-    public $id_user;
-    public $id_troop;
+    protected ?int $id_troop_leader;
+    public int $id_user;
+    public int $id_troop;
 
     public function __construct(array $data) {
         $notNullArguments = ['id_user', 'id_troop'];

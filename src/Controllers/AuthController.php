@@ -246,10 +246,4 @@ class AuthController {
 
         return true;
     }
-
-    private function f(){
-
-    }
-
-
 }

@@ -4,14 +4,14 @@ namespace App\Models;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Task extends BaseModel {
-    protected $id_task;
-    protected $number;
-    protected $name;
-    protected $description;
-    protected $category;
-    protected $subcategory;
-    protected $tag;
-    protected $id_troop;
+    protected ?int $id_task;
+    protected int $number;
+    protected string $name;
+    protected string $description;
+    protected string $category;
+    protected string $subcategory;
+    protected ?string $tag;
+    protected ?int $id_troop;
 
 
     public function __construct(array $data) {
@@ -31,16 +31,19 @@ class Task extends BaseModel {
 
     public function jsonSerialize(): mixed
     {
-        return [
-            'id_task' => $this->id_task,
+        $data = [
             'number' => $this->number,
             'name' => $this->name,
             'description' => $this->description,
             'category' => $this->category,
             'subcategory' => $this->subcategory,
-            'tag' => $this->tag,
-            'id_troop' => $this->id_troop
         ];
+
+        if ($this->id_troop != null) { $data['id_troop'] = $this->id_troop;}
+        if ($this->tag != null) { $data['tag'] = $this->tag;}
+        if ($this->id_task != null) { $data['id_task'] = $this->id_task;}
+
+        return $data;
     }
 
     public function getId()

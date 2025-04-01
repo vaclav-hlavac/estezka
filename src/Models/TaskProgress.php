@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
+use DateTime;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class TaskProgress extends BaseModel
 {
-    public $id_user;
-    public $id_task;
-    public $status;
-    public $planned_to;
-    public $completed_at;
-    public $confirmed_by;
-    public $confirmed_at;
-    public $filled_text;
-    public $id_task_progress;
+    public int $id_user;
+    public int $id_task;
+    public string $status;
+    public ?DateTime $planned_to;
+    public ?DateTime $completed_at;
+    public ?int $confirmed_by;
+    public ?DateTime $confirmed_at;
+    public ?int $id_task_progress;
 
     public function __construct(array $data)
     {
@@ -29,22 +30,24 @@ class TaskProgress extends BaseModel
         $this->completed_at = $data['completed_at'] ?? null;
         $this->confirmed_by = $data['confirmed_by'] ?? null;
         $this->confirmed_at = $data['confirmed_at'] ?? null;
-        $this->filled_text = $data['filled_text'] ?? null;
     }
 
     public function jsonSerialize(): mixed
     {
-        return [
-            'id_task_progress' => $this->id_task_progress,
+        $data = [
             'id_user' => $this->id_user,
             'id_task' => $this->id_task,
             'status' => $this->status,
-            'planned_to' => $this->planned_to,
-            'completed_at' => $this->completed_at,
-            'confirmed_by' => $this->confirmed_by,
-            'confirmed_at' => $this->confirmed_at,
-            'filled_text' => $this->filled_text
         ];
+
+        if ($this->id_task_progress != null) { $data['id_task_progress'] = $this->id_task_progress;}
+        if ($this->planned_to != null) { $data['planned_to'] = $this->planned_to;}
+        if ($this->completed_at != null) { $data['completed_at'] = $this->completed_at;}
+        if ($this->confirmed_by != null) { $data['confirmed_by'] = $this->confirmed_by;}
+        if ($this->confirmed_at != null) { $data['confirmed_at'] = $this->confirmed_at;}
+        if ($this->confirmed_at != null) { $data['confirmed_at'] = $this->confirmed_at;}
+
+        return $data;
     }
 
     public function getId()

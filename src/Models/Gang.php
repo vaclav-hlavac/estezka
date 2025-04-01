@@ -6,9 +6,9 @@ use Random\RandomException;
 
 class Gang extends BaseModel
 {
-    public $name;
-    public $id_troop;
-    public $id_gang;
+    public string $name;
+    public int $id_troop;
+    public ?int $id_gang;
     public string $invite_code;
 
     /**
@@ -29,12 +29,15 @@ class Gang extends BaseModel
 
     public function jsonSerialize(): mixed
     {
-        return [
-            'id_gang' => $this->id_gang,
+        $data = [
             'id_troop' => $this->id_troop,
             'name' => $this->name,
             'invite_code' => $this->invite_code,
         ];
+
+        if ($this->id_gang != null) { $data['id_gang'] = $this->id_gang;}
+
+        return $data;
     }
 
     public function getId()

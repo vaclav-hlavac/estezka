@@ -9,9 +9,9 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 class GangLeader extends BaseModel
 {
-    protected $id_gang_leader;
-    public $id_user;
-    public $id_gang;
+    protected ?int $id_gang_leader;
+    public int $id_user;
+    public int $id_gang;
 
     public function __construct(array $data) {
         $notNullArguments = ['id_user', 'id_gang'];
