@@ -8,6 +8,6 @@ use App\Repository\CommentRepository;
 class CommentController extends CRUDController
 {
     public function __construct($pdo) {
-        parent::__construct($pdo, Comment::class, CommentRepository::class );
+        parent::__construct($pdo, Comment::class, new CommentRepository($pdo) );
     }
 }

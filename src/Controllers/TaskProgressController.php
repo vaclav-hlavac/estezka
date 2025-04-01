@@ -8,7 +8,7 @@ use App\Repository\TaskProgressRepository;
 class TaskProgressController extends CRUDController
 {
     public function __construct($pdo) {
-        parent::__construct($pdo, TaskProgress::class, TaskProgressRepository::class );
+        parent::__construct($pdo, TaskProgress::class, new TaskProgressRepository($pdo) );
     }
 
 }

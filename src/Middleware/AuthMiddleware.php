@@ -5,6 +5,7 @@ use App\Utils\JsonResponseHelper;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Monolog\Handler\ErrorLogHandler;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
@@ -15,7 +16,13 @@ class AuthMiddleware {
         // Getting authorization header and syntax control
         $authHeader = $request->getHeaderLine('Authorization');
         if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            error_log("Auth middleware 1");
             return JsonResponseHelper::jsonResponse('Unauthorized', 401, new SlimResponse());
+        }
+
+        if (isset($decoded->exp) && $decoded->exp < time()) {
+            error_log("Auth middleware Time");
+            return JsonResponseHelper::jsonResponse('Token expired', 401, new SlimResponse());
         }
 
         $jwt = $matches[1];
@@ -26,6 +33,7 @@ class AuthMiddleware {
             // Adding authorized user to request
             $request = $request->withAttribute('auth_user', $decoded);
         } catch (Exception $e) {
+            error_log("JWT decode error: " . $e->getMessage());
             return JsonResponseHelper::jsonResponse('Unauthorized', 401, new SlimResponse());
         }
 

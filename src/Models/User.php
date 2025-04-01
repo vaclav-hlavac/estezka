@@ -19,7 +19,7 @@ class User extends BaseModel {
     public ?String $gang_color;
     public ?int $completed_tasks;
     public ?int $total_tasks;
-    public ?int $activePathLevel;
+    public ?int $active_path_level;
 
     public function __construct(array $data) {
         $notNullArguments = [];
@@ -37,7 +37,7 @@ class User extends BaseModel {
         $this->gang_color = $data['gang_color'] ?? null;
         $this->completed_tasks = $data['completed_tasks'] ?? null;
         $this->total_tasks = $data['total_tasks'] ?? null;
-        $this->activePathLevel = $data['active_path_level'] ?? null;
+        $this->active_path_level = $data['active_path_level'] ?? null;
     }
 
     public function toDatabase(): array {
@@ -55,7 +55,7 @@ class User extends BaseModel {
         if ($this->gang_color != null) { $data['color'] = $this->gang_color;}
         if ($this->completed_tasks != null) { $data['completed_tasks'] = $this->completed_tasks;}
         if ($this->total_tasks != null) { $data['total_tasks'] = $this->total_tasks;}
-        if ($this->activePathLevel != null) { $data['active_path_level'] = $this->activePathLevel;}
+        if ($this->active_path_level != null) { $data['active_path_level'] = $this->active_path_level;}
 
         return $data;
     }
@@ -75,7 +75,7 @@ class User extends BaseModel {
         if ($this->gang_color != null) { $data['color'] = $this->gang_color;}
         if ($this->completed_tasks != null) { $data['completed_tasks'] = $this->completed_tasks;}
         if ($this->total_tasks != null) { $data['total_tasks'] = $this->total_tasks;}
-        if ($this->activePathLevel != null) { $data['active_path_level'] = $this->activePathLevel;}
+        if ($this->active_path_level != null) { $data['active_path_level'] = $this->active_path_level;}
 
         return $data;
     }

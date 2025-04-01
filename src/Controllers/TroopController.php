@@ -20,9 +20,8 @@ use PhpParser\Node\Expr\Array_;
  */
 class TroopController extends CRUDController
 {
-
     public function __construct($pdo) {
-        parent::__construct($pdo, Troop::class, TroopRepository::class );
+        parent::__construct($pdo, Troop::class, new TroopRepository($pdo));
     }
 
 
@@ -128,27 +127,12 @@ class TroopController extends CRUDController
     }
 
 
-    public function getTroopMembers($request, $response, $args) {
-        $troopRepository = new TroopRepository($this->pdo);
+    public function getTroopMembers($request, $response, $args)
+    {
+        $troopId = (int)($args['id'] ?? 0);
 
-        try {
-            $members = $troopRepository->findAllMembersById($args['id']);
+        $members = $this->repository->findAllMembersWithRoleGangMember($troopId);
 
-
-            $gangRepository = new GangRepository($this->pdo);
-            $gangs = $gangRepository->findAllByTroopId($args['id']);
-        }catch (DatabaseException $e) {
-            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
-        }
-
-        if(Troop::find($this->pdo, $args['id']) == null){
-            $response->getBody()->write(json_encode(['message' => 'Troop not found']));
-            return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
-        }
-
-        $gangs = Gang::getAllByTroopId($this->pdo, $args['id']);
-
-        $response->getBody()->write(json_encode($gangs));
-        return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+        return JsonResponseHelper::jsonResponse($members, 200, $response);
     }
 }

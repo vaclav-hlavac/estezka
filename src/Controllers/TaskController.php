@@ -11,7 +11,7 @@ use InvalidArgumentException;
 
 class TaskController extends CRUDController{
     public function __construct($pdo) {
-        parent::__construct($pdo, Task::class, TaskRepository::class );
+        parent::__construct($pdo, Task::class, new TaskRepository($pdo) );
     }
 
 

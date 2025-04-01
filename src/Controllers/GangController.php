@@ -10,7 +10,7 @@ use App\Utils\JsonResponseHelper;
 class GangController extends CRUDController
 {
     public function __construct($pdo) {
-        parent::__construct($pdo, Gang::class, GangRepository::class );
+        parent::__construct($pdo, Gang::class, new GangRepository($pdo) );
     }
 
     public function getGangMembers(){

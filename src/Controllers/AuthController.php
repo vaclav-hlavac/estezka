@@ -13,6 +13,7 @@ use App\Repository\GangRepository;
 use App\Repository\RefreshTokenRepository;
 use App\Repository\Roles\GangMemberRepository;
 use App\Repository\Roles\TroopLeaderRepository;
+use App\Repository\TaskProgressRepository;
 use App\Repository\TroopRepository;
 use App\Repository\UserRepository;
 use App\Services\AuthService;
@@ -130,6 +131,11 @@ class AuthController {
             return JsonResponseHelper::jsonResponse('Refresh token could not be generated.', 500, $response);
         }
 
+/*        $taskProgressRepository = new TaskProgressRepository($this->pdo);
+        if(!$taskProgressRepository->userHasAnyProgress($user->getId())){
+            $taskProgressRepository->createAllToUser($user->getId());
+        }*/
+
         // Return response with token
         $jwt = $this->authService->generateJWT($user);
         return JsonResponseHelper::jsonResponse([
@@ -243,6 +249,15 @@ class AuthController {
         ]);
 
         $gangMemberRepository->insert($gangMember->jsonSerialize());
+
+        //creating task_progress for each task
+        $taskProgressRepository = new TaskProgressRepository($this->pdo);
+        try {
+            $taskProgressRepository->createAllToUser($savedUser->getId());
+        } catch (Exception $e) {
+            $gangMemberRepository->delete($savedUser->getId());
+            throw $e;
+        }
 
         return true;
     }

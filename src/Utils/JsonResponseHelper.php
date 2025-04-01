@@ -23,6 +23,6 @@ class JsonResponseHelper
         }
 
         $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+        return $response->withHeader('Content-Type', 'application/json; charset=utf-8')->withStatus($status);
     }
 }

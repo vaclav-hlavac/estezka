@@ -30,12 +30,12 @@ abstract class CRUDController
     /**
      * @param PDO $pdo
      * @param class-string<TModel> $modelClass
-     * @param class-string<TRepository> $repositoryClass
+     * @param GenericRepository $repository
      */
-    public function __construct(PDO $pdo, string $modelClass, string $repositoryClass) {
+    public function __construct(PDO $pdo, string $modelClass, GenericRepository $repository) {
         $this->pdo = $pdo;
         $this->modelClass = $modelClass;
-        $this->repository = new $repositoryClass($this->pdo);
+        $this->repository = $repository;
     }
 
     public function getAll($request, $response, $args) {

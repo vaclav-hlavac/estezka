@@ -10,6 +10,6 @@ class UserController extends CRUDController
 {
 
     public function __construct($pdo) {
-        parent::__construct($pdo, User::class, UserRepository::class );
+        parent::__construct($pdo, User::class, new UserRepository($pdo) );
     }
 }

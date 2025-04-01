@@ -18,6 +18,59 @@ class TaskProgressRepository extends GenericRepository {
     }
 
     /**
+     * Create task_progress for all general tasks and for all tasks
+     * of a troop, that the user is in (over gang_member → gang → troop).
+     *
+     * @param int $id_user ID uživatele (musí existovat v gang_member).
+     * @return void
+     * @throws DatabaseException pokud dojde k DB chybě.
+     */
+    public function createAllToUser(int $id_user): void
+    {
+        $sqlFindTroop = "
+        SELECT t.id_troop
+        FROM troop t
+        JOIN gang g ON g.id_troop = t.id_troop
+        JOIN gang_member gm ON gm.id_gang = g.id_gang
+        WHERE gm.id_user = :id_user
+        LIMIT 1
+    ";
+
+        try {
+            $stmt = $this->pdo->prepare($sqlFindTroop);
+            $stmt->execute(['id_user' => $id_user]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new DatabaseException("Chyba při získávání troop_id: " . $e->getMessage(), 500, $e);
+        }
+
+        if (!$row) {
+            // User is not in any gang/patrol
+            throw new DatabaseException("Chyba při získávání troop_id: User is not in any patrol." , 400);
+        }
+        $troopId = (int)$row['id_troop'];
+
+
+        $sqlInsert = "
+        INSERT INTO task_progress (id_user, id_task, status)
+        SELECT :id_user, t.id_task, 'not_started'
+        FROM task t
+        WHERE t.id_troop = :troop_id
+           OR t.id_troop IS NULL
+    ";
+
+        try {
+            $stmtInsert = $this->pdo->prepare($sqlInsert);
+            $stmtInsert->execute([
+                'id_user' => $id_user,
+                'troop_id' => $troopId,
+            ]);
+        } catch (PDOException $e) {
+            throw new DatabaseException("Chyba při vkládání do task_progress: " . $e->getMessage(), 500, $e);
+        }
+    }
+
+    /**
      * Saves DateTime atribut to planned_to column of Task by task's ID
      * @param int $id
      * @param DateTime $plannedTo
@@ -97,4 +150,30 @@ class TaskProgressRepository extends GenericRepository {
             throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
         }
     }
+
+    /**
+     * CHeck, if user (id_user) has already inserted any task_progress.
+     *
+     * @param int $id_user
+     * @return bool true, if exists at least one row
+     * @throws DatabaseException
+     */
+    public function userHasAnyProgress(int $id_user): bool
+    {
+        $sql = "SELECT COUNT(*) AS cnt 
+            FROM task_progress 
+            WHERE id_user = :id_user";
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['id_user' => $id_user]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $result && $result['cnt'] > 0;
+        } catch (PDOException $e) {
+            throw new DatabaseException("Chyba při ověřování task_progress: " . $e->getMessage(), 500, $e);
+        }
+    }
+
+
 }
