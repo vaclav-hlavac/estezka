@@ -17,6 +17,7 @@ use App\Repository\TaskProgressRepository;
 use App\Repository\TroopRepository;
 use App\Repository\UserRepository;
 use App\Services\AuthService;
+use App\Services\UserRolesService;
 use App\Utils\JsonResponseHelper;
 use DateTime;
 use Exception;
@@ -43,8 +44,6 @@ class AuthController {
     public function register($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
-
-        error_log(print_r($data, true));
 
         // lower-case and delete spaces of some arguments
         $data['email'] = trim(strtolower($data['email'] ?? ''));
@@ -86,7 +85,6 @@ class AuthController {
                 }
             }
         } catch (Exception $e) {
-            error_log("jdu deletovat!!!" . $user->jsonSerialize());
             $userRepository->delete($user->getId());
             return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
@@ -101,13 +99,13 @@ class AuthController {
 
         // Check required fields
         if (empty($data['email']) || empty($data['password'])) {
-            return JsonResponseHelper::jsonResponse('Missing nickname or password', 400, $response);
+            return JsonResponseHelper::jsonResponse('Missing email or password', 400, $response);
         }
 
         // Authenticate user
         try {
             $user = $this->authenticateUser($data['email'], $data['password']);
-            if($user == null){
+            if ($user == null) {
                 return JsonResponseHelper::jsonResponse('Wrong email or password', 401, $response);
             }
         } catch (DatabaseException $e) {
@@ -117,30 +115,35 @@ class AuthController {
         // Refresh token
         try {
             $refreshToken = new RefreshToken(['id_user' => $user->getId()]);
-            $token_repository = new RefreshTokenRepository($this->pdo);
+            $tokenRepository = new RefreshTokenRepository($this->pdo);
+
             $attempts = 0;
-            while($token_repository->tokenExists($refreshToken->token)) {
+            while ($tokenRepository->tokenExists($refreshToken->token)) {
                 $refreshToken->generateNewToken();
                 $attempts++;
-                if ($attempts > 10) { // Protection against too many loops
+                if ($attempts > 10) {
                     return JsonResponseHelper::jsonResponse('Refresh token could not be generated.', 500, $response);
                 }
             }
-            $token_repository->insert($refreshToken->jsonSerialize());
-        } catch (Exception $e){
+            $tokenRepository->insert($refreshToken->jsonSerialize());
+        } catch (Exception $e) {
             return JsonResponseHelper::jsonResponse('Refresh token could not be generated.', 500, $response);
         }
 
-/*        $taskProgressRepository = new TaskProgressRepository($this->pdo);
-        if(!$taskProgressRepository->userHasAnyProgress($user->getId())){
-            $taskProgressRepository->createAllToUser($user->getId());
-        }*/
+        // Load user with roles
+        $userRolesService = new UserRolesService($this->pdo);
+        $userWithRoles = $userRolesService->loadByUserId($user->getId());
 
-        // Return response with token
+        if (!$userWithRoles) {
+            return JsonResponseHelper::jsonResponse('Failed to load user roles.', 500, $response);
+        }
+
+        // Return response with token and user with roles
         $jwt = $this->authService->generateJWT($user);
         return JsonResponseHelper::jsonResponse([
             'access_token' => $jwt,
             'refresh_token' => $refreshToken->token,
+            'user' => $userWithRoles,
         ], 200, $response);
     }
 
@@ -157,25 +160,34 @@ class AuthController {
 
         // Validate refresh token
         try {
-            $token_repository = new RefreshTokenRepository($this->pdo);
-            $user_id = $token_repository->findUserIdByToken($refreshToken);
+            $tokenRepository = new RefreshTokenRepository($this->pdo);
+            $userId = $tokenRepository->findUserIdByToken($refreshToken);
 
-            if (!$user_id) {
+            if (!$userId) {
                 return JsonResponseHelper::jsonResponse('Invalid or expired refresh token', 401, $response);
             }
 
             // Fetch user
-            $user_repository = new UserRepository($this->pdo);
-            $user = $user_repository->findById($user_id);
+            $userRepository = new UserRepository($this->pdo);
+            $user = $userRepository->findById($userId);
             if (!$user) {
                 return JsonResponseHelper::jsonResponse('User not found', 404, $response);
+            }
+
+            // Fetch user roles
+            $userRolesService = new \App\Services\UserRolesService($this->pdo);
+            $userWithRoles = $userRolesService->loadByUserId($user->getId());
+
+            if (!$userWithRoles) {
+                return JsonResponseHelper::jsonResponse('Failed to load user roles.', 500, $response);
             }
 
             // Generate new access token
             $jwt = $this->authService->generateJWT($user);
 
             return JsonResponseHelper::jsonResponse([
-                'access_token' => $jwt
+                'access_token' => $jwt,
+                'user' => $userWithRoles,
             ], 200, $response);
         } catch (DatabaseException $e) {
             return JsonResponseHelper::jsonResponse('Token refresh failed: ' . $e->getMessage(), 500, $response);
@@ -228,7 +240,7 @@ class AuthController {
     /**
      * @param $invite_code
      * @param User $savedUser
-     * @return bool false if no gang found by invite_code
+     * @return bool false if no patrol found by invite_code
      * @throws DatabaseException
      */
     private function setGangMemberRoleByInvoiceCode($invite_code, User $savedUser): bool
@@ -245,7 +257,7 @@ class AuthController {
         $gangMemberRepository = new GangMemberRepository($this->pdo);
         $gangMember = new GangMember([
             "id_user" => $savedUser->getId(),
-            "id_gang" => $gang->getId()
+            "id_patrol" => $gang->getId()
         ]);
 
         $gangMemberRepository->insert($gangMember->jsonSerialize());

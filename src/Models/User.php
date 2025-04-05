@@ -15,11 +15,6 @@ class User extends BaseModel {
     public string $password;
     public string $email;
     public bool $notifications_enabled;
-    public ?string $gang_name;
-    public ?String $gang_color;
-    public ?int $completed_tasks;
-    public ?int $total_tasks;
-    public ?int $active_path_level;
 
     public function __construct(array $data) {
         $notNullArguments = [];
@@ -33,11 +28,6 @@ class User extends BaseModel {
         $this->password = $data['password'];
         $this->email = $data['email'];
         $this->notifications_enabled = $data['notifications_enabled'] ?? true;
-        $this->gang_name = $data['gang_name'] ?? null;
-        $this->gang_color = $data['gang_color'] ?? null;
-        $this->completed_tasks = $data['completed_tasks'] ?? null;
-        $this->total_tasks = $data['total_tasks'] ?? null;
-        $this->active_path_level = $data['active_path_level'] ?? null;
     }
 
     public function toDatabase(): array {
@@ -51,11 +41,6 @@ class User extends BaseModel {
         ];
 
         if ($this->id_user != null) { $data['id_user'] = $this->id_user;}
-        if ($this->gang_name != null) { $data['patrol_name'] = $this->gang_name;}
-        if ($this->gang_color != null) { $data['color'] = $this->gang_color;}
-        if ($this->completed_tasks != null) { $data['completed_tasks'] = $this->completed_tasks;}
-        if ($this->total_tasks != null) { $data['total_tasks'] = $this->total_tasks;}
-        if ($this->active_path_level != null) { $data['active_path_level'] = $this->active_path_level;}
 
         return $data;
     }
@@ -71,11 +56,6 @@ class User extends BaseModel {
         ];
 
         if ($this->id_user != null) { $data['id_user'] = $this->id_user;}
-        if ($this->gang_name != null) { $data['patrol_name'] = $this->gang_name;}
-        if ($this->gang_color != null) { $data['color'] = $this->gang_color;}
-        if ($this->completed_tasks != null) { $data['completed_tasks'] = $this->completed_tasks;}
-        if ($this->total_tasks != null) { $data['total_tasks'] = $this->total_tasks;}
-        if ($this->active_path_level != null) { $data['active_path_level'] = $this->active_path_level;}
 
         return $data;
     }
@@ -84,7 +64,7 @@ class User extends BaseModel {
         return [
             'id_user' => $this->id_user,
             'email' => $this->email,
-            'exp' => time() + 3600 // Token expires in 1 hour
+            'exp' => time() + 60000 // Token expires in cca 2 hours
         ];
     }
 

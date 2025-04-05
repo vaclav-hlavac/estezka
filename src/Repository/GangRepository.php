@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
  */
 class GangRepository extends GenericRepository {
     public function __construct(PDO $pdo) {
-        parent::__construct($pdo, 'gang', 'id_gang', Gang::class);
+        parent::__construct($pdo, 'patrol', 'id_patrol', Gang::class);
     }
 
     /**

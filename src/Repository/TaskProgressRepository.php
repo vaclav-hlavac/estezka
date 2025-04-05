@@ -19,9 +19,9 @@ class TaskProgressRepository extends GenericRepository {
 
     /**
      * Create task_progress for all general tasks and for all tasks
-     * of a troop, that the user is in (over gang_member → gang → troop).
+     * of a troop, that the user is in (over patrol_member → patrol → troop).
      *
-     * @param int $id_user ID uživatele (musí existovat v gang_member).
+     * @param int $id_user ID uživatele (musí existovat v patrol_member).
      * @return void
      * @throws DatabaseException pokud dojde k DB chybě.
      */
@@ -30,8 +30,8 @@ class TaskProgressRepository extends GenericRepository {
         $sqlFindTroop = "
         SELECT t.id_troop
         FROM troop t
-        JOIN gang g ON g.id_troop = t.id_troop
-        JOIN gang_member gm ON gm.id_gang = g.id_gang
+        JOIN patrol g ON g.id_troop = t.id_troop
+        JOIN patrol_member gm ON gm.id_patrol = g.id_patrol
         WHERE gm.id_user = :id_user
         LIMIT 1
     ";
@@ -45,7 +45,7 @@ class TaskProgressRepository extends GenericRepository {
         }
 
         if (!$row) {
-            // User is not in any gang/patrol
+            // User is not in any patrol
             throw new DatabaseException("Chyba při získávání troop_id: User is not in any patrol." , 400);
         }
         $troopId = (int)$row['id_troop'];
@@ -172,6 +172,35 @@ class TaskProgressRepository extends GenericRepository {
             return $result && $result['cnt'] > 0;
         } catch (PDOException $e) {
             throw new DatabaseException("Chyba při ověřování task_progress: " . $e->getMessage(), 500, $e);
+        }
+    }
+
+
+    /**
+     * Retrieves all task progress records associated with a specific user.
+     *
+     * @param int $id_user The ID of the user whose task progress we want to retrieve.
+     * @return array<TaskProgress> An array of all matching task progress records.
+     * @throws DatabaseException If a database error occurs during the operation.
+     */
+    public function findAllByIdUser(int $id_user): array
+    {
+        error_log("jsem v find all by id user: " . $id_user);
+
+        $sql = "SELECT * FROM task_progress WHERE id_user = :id_user";
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['id_user' => $id_user]);
+
+            $results =  $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log(print_r($results, true));
+
+            return array_map(fn($row) => new TaskProgress($row), $results);
+
+
+        } catch (PDOException $e) {
+            throw new DatabaseException("Chyba při získávání task_progress pro uživatele: " . $e->getMessage(), 500, $e);
         }
     }
 

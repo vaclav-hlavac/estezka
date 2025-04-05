@@ -27,9 +27,9 @@ class TroopController extends CRUDController
 
     /**
      * @OA\Post(
-     *     path="/troops/{id}/gang",
+     *     path="/troops/{id}/patrol",
      *     summary="Vytvořit novou družinu v oddíle",
-     *     tags={"Troops", "Gangs"},
+     *     tags={"Troops", "Patrols"},
      *     @OA\Parameter(
      *             name="id",
      *             in="path",
@@ -95,9 +95,9 @@ class TroopController extends CRUDController
 
     /**
      * @OA\Get(
-     *     path="/troops/{id}/gang",
+     *     path="/troops/{id}/patrol",
      *      summary="Získat všechny družiny oddílu",
-     *      tags={"Troops", "Gangs"},
+     *      tags={"Troops", "Patrols"},
      *      @OA\Parameter(
      *              name="id",
      *              in="path",
@@ -131,7 +131,11 @@ class TroopController extends CRUDController
     {
         $troopId = (int)($args['id'] ?? 0);
 
-        $members = $this->repository->findAllMembersWithRoleGangMember($troopId);
+        try {
+            $members = $this->repository->findAllMembersWithRoleGangMember($troopId);
+        }catch (DatabaseException $e) {
+            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
+        }
 
         return JsonResponseHelper::jsonResponse($members, 200, $response);
     }
