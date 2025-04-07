@@ -76,7 +76,7 @@ abstract class CRUDController
 
         // save + response
         try {
-            $savedObject = $this->repository->insert($object->jsonSerialize()); //todo toArray??
+            $savedObject = $this->repository->insert($object->toDatabase());
             return JsonResponseHelper::jsonResponse($savedObject, 201, $response);
 
         }catch (DatabaseException $e) {

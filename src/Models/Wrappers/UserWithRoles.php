@@ -28,8 +28,8 @@ class UserWithRoles implements \JsonSerializable
     {
         return [
             'user' => $this->user,
-            'gang_member' => $this->gang_member,
-            'gang_leaders' => $this->gang_leaders,
+            'patrol_member' => $this->gang_member,
+            'patrol_leaders' => $this->gang_leaders,
             'troop_leaders' => $this->troop_leaders,
         ];
     }

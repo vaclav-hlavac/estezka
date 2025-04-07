@@ -49,4 +49,9 @@ class Comment extends BaseModel
     {
         return $this->id_comment;
     }
+
+    public function toDatabase()
+    {
+        return $this->jsonSerialize();
+    }
 }

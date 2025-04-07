@@ -48,4 +48,9 @@ class Gang extends BaseModel
     public function refreshInviteCode(){
         $this->invite_code = bin2hex(random_bytes(32));
     }
+
+    public function toDatabase()
+    {
+        return $this->jsonSerialize();
+    }
 }

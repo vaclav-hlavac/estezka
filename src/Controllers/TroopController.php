@@ -83,7 +83,7 @@ class TroopController extends CRUDController
         }
 
         try {
-            $gang = $gangRepository->insert($gang->jsonSerialize());
+            $gang = $gangRepository->insert($gang->toDatabase());
         }catch (DatabaseException $e) {
             return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }

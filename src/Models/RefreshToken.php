@@ -55,4 +55,9 @@ class RefreshToken extends BaseModel
             'created_at' => $this->created_at,
         ];
     }
+
+    public function toDatabase()
+    {
+        return $this->jsonSerialize();
+    }
 }

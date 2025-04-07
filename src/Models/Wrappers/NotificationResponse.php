@@ -4,8 +4,9 @@ namespace App\Models\Wrappers;
 
 use App\Models\Notification;
 use App\Models\TaskProgress;
+use JsonSerializable;
 
-class NotificationResponse implements \JsonSerializable {
+class NotificationResponse implements JsonSerializable {
     public Notification $notification;
     public ?TaskProgress $taskProgress;
 

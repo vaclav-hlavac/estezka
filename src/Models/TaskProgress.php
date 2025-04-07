@@ -54,4 +54,9 @@ class TaskProgress extends BaseModel
     {
         return $this->id_task_progress;
     }
+
+    public function toDatabase()
+    {
+        return $this->jsonSerialize();
+    }
 }

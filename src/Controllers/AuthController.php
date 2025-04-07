@@ -125,7 +125,7 @@ class AuthController {
                     return JsonResponseHelper::jsonResponse('Refresh token could not be generated.', 500, $response);
                 }
             }
-            $tokenRepository->insert($refreshToken->jsonSerialize());
+            $tokenRepository->insert($refreshToken->toDatabase());
         } catch (Exception $e) {
             return JsonResponseHelper::jsonResponse('Refresh token could not be generated.', 500, $response);
         }
@@ -226,7 +226,7 @@ class AuthController {
         // Creating new troop
         $troop = new Troop($data['new_troop']);
         $troopRepository = new TroopRepository($this->pdo);
-        $troopRepository->insert($troop->jsonSerialize());
+        $troopRepository->insert($troop->toDatabase());
 
         // Setting TroopLeader role
         $troopLeaderRepository = new TroopLeaderRepository($this->pdo);
@@ -234,7 +234,7 @@ class AuthController {
             "id_user" => $savedUser->getId(),
             "id_troop" => $data['id_troop']
         ]);
-        $troopLeaderRepository->insert($troopLeader->jsonSerialize());
+        $troopLeaderRepository->insert($troopLeader->toDatabase());
     }
 
     /**
@@ -260,7 +260,7 @@ class AuthController {
             "id_patrol" => $gang->getId()
         ]);
 
-        $gangMemberRepository->insert($gangMember->jsonSerialize());
+        $gangMemberRepository->insert($gangMember->toDatabase());
 
         //creating task_progress for each task
         $taskProgressRepository = new TaskProgressRepository($this->pdo);

@@ -43,4 +43,6 @@ abstract class BaseModel implements JsonSerializable
 
     abstract public function getId();
 
+    abstract public function toDatabase();
+
 }

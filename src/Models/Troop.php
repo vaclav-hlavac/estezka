@@ -36,4 +36,9 @@ class Troop extends BaseModel {
     {
         return $this->id_troop;
     }
+
+    public function toDatabase()
+    {
+        return $this->jsonSerialize();
+    }
 }

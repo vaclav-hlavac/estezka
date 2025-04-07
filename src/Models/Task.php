@@ -50,4 +50,9 @@ class Task extends BaseModel {
     {
         return $this->id_task;
     }
+
+    public function toDatabase()
+    {
+        return $this->jsonSerialize();
+    }
 }
