@@ -2,20 +2,20 @@
 
 namespace App\Models;
 
+use DateTimeInterface;
+
 class Notification extends BaseModel
 {
     public ?int $id_notification;
     public int $id_user_creator;
-    public ?string $creator_name;
     public int $id_user_receiver;
     public string $text;
     public bool $was_received;
     public string $type;
 
     public ?int $id_task_progress;
-    public ?string $created_at;
-    public ?string $updated_at;
-
+    public ?\DateTime $created_at;
+    public ?\DateTime $updated_at;
 
     public function __construct(array $data)
     {
@@ -29,9 +29,8 @@ class Notification extends BaseModel
         $this->type = $data['type'] ?? 'generic';
         $this->was_received = $data['was_received'] ?? false;
         $this->id_task_progress = $data['id_task_progress'] ?? null;
-        $this->created_at = $data['created_at'] ?? null;
-        $this->updated_at = $data['updated_at'] ?? null;
-        $this->creator_name = $data['creator_name'] ?? null;
+        $this->created_at = $this->convertToDateTimeIfNeeded($data['created_at'] ?? null);
+        $this->updated_at = $this->convertToDateTimeIfNeeded($data['updated_at'] ?? null);
     }
 
     public function toDatabase(): array
@@ -40,7 +39,7 @@ class Notification extends BaseModel
             'id_user_creator' => $this->id_user_creator,
             'id_user_receiver' => $this->id_user_receiver,
             'text' => $this->text,
-            'was_received' => $this->was_received,
+            'was_received' => $this->formatForDatabase($this->was_received),
             'id_task_progress' => $this->id_task_progress,
             'type' => $this->type,
         ];
@@ -55,10 +54,9 @@ class Notification extends BaseModel
             'text' => $this->text,
             'was_received' => $this->was_received,
             'id_task_progress' => $this->id_task_progress,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at?->format(DateTimeInterface::ATOM),
+            'updated_at' => $this->updated_at?->format(DateTimeInterface::ATOM),
             'type' => $this->type,
-            'creator?name' => $this->creator_name,
         ];
     }
 
@@ -66,4 +64,5 @@ class Notification extends BaseModel
     {
         return $this->id_notification;
     }
+
 }

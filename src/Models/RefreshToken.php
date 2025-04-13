@@ -25,7 +25,7 @@ class RefreshToken extends BaseModel
         $this->requiredArgumentsControl($data, $notNullArguments);
 
         $this->token = bin2hex(random_bytes(32));
-        $this->expires_at = (new DateTime())->modify('+120 days')->format('Y-m-d H:i:s');
+        $this->expires_at = $this->formatForDatabase((new DateTime())->modify('+120 days'));
 
         $this->id_refresh_token = $data['id_refresh_token'] ?? null;
         $this->id_user = $data['id_user'];

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models;
+use DateTime;
+use DateTimeInterface;
 use InvalidArgumentException;
 use JsonSerializable;
 
@@ -39,6 +41,32 @@ abstract class BaseModel implements JsonSerializable
                 throw new InvalidArgumentException("Model {$className} does not have a field: $key", 400);
             }
         }
+    }
+
+    protected function formatForDatabase($value)
+    {
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        if (is_bool($value)) {
+            return $value ? 1 : 0;
+        }
+
+        return $value;
+    }
+
+    protected function convertToDateTimeIfNeeded($value): ?\DateTime
+    {
+        if ($value instanceof DateTime) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            return new DateTime($value);
+        }
+
+        return null;
     }
 
     abstract public function getId();

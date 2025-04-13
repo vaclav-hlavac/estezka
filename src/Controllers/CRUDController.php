@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 use App\Exceptions\DatabaseException;
+use App\Exceptions\NotFoundException;
 use App\Models\BaseModel;
 use App\Repository\GenericRepository;
 use App\Utils\JsonResponseHelper;
@@ -48,11 +49,7 @@ abstract class CRUDController
     }
 
     public function getById($request, $response, $args) {
-        try {
-            $foundObject = $this->repository->findById($args['id']);
-        }catch (DatabaseException $e) {
-            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
-        }
+        $foundObject = $this->repository->findById($args['id']);
 
 
         if ($foundObject) {
@@ -88,29 +85,21 @@ abstract class CRUDController
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
 
-        try{
-            // exist check
-            $foundObject = $this->repository->findById($args['id']);
-            if ($foundObject == null) {
-                return JsonResponseHelper::jsonResponse('Object not found', 404, $response);
-            }
-
-            // set new attributes
-            $foundObject->setAttributes($data);
-
-            // update
-            $updatedObject = $this->repository->update($foundObject->getId(), $foundObject->jsonSerialize()); // todo toArray??
-
+        // exist check
+        $foundObject = $this->repository->findById($args['id']);
+        if ($foundObject == null) {
+            throw new NotFoundException('Object not found', 404);
         }
-        catch (DatabaseException|InvalidArgumentException $e) {
-            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
-        }
+
+        // set new attributes and update
+        $foundObject->setAttributes($data);
+        $updatedObject = $this->repository->update($foundObject->getId(), $foundObject->jsonSerialize()); // todo toArray??
 
         // response
         if ($updatedObject) {
             return JsonResponseHelper::jsonResponse($updatedObject, 200, $response);
         } else {
-            return JsonResponseHelper::jsonResponse('Object not found', 404, $response);
+            throw new DatabaseException('Object update failed', 500);
         }
     }
 

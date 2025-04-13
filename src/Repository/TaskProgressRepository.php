@@ -185,8 +185,6 @@ class TaskProgressRepository extends GenericRepository {
      */
     public function findAllByIdUser(int $id_user): array
     {
-        error_log("jsem v find all by id user: " . $id_user);
-
         $sql = "SELECT * FROM task_progress WHERE id_user = :id_user";
 
         try {
@@ -194,7 +192,6 @@ class TaskProgressRepository extends GenericRepository {
             $stmt->execute(['id_user' => $id_user]);
 
             $results =  $stmt->fetchAll(PDO::FETCH_ASSOC);
-            error_log(print_r($results, true));
 
             return array_map(fn($row) => new TaskProgress($row), $results);
 

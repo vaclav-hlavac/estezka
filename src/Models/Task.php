@@ -4,14 +4,14 @@ namespace App\Models;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Task extends BaseModel {
-    protected ?int $id_task;
-    protected int $number;
-    protected string $name;
-    protected string $description;
-    protected string $category;
-    protected string $subcategory;
-    protected ?string $tag;
-    protected ?int $id_troop;
+    public ?int $id_task;
+    public int $number;
+    public string $name;
+    public string $description;
+    public string $category;
+    public string $subcategory;
+    public ?string $tag;
+    public ?int $id_troop;
 
 
     public function __construct(array $data) {

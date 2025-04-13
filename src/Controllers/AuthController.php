@@ -143,7 +143,7 @@ class AuthController {
         return JsonResponseHelper::jsonResponse([
             'access_token' => $jwt,
             'refresh_token' => $refreshToken->token,
-            'user' => $userWithRoles,
+            'user_with_roles' => $userWithRoles,
         ], 200, $response);
     }
 
@@ -187,7 +187,7 @@ class AuthController {
 
             return JsonResponseHelper::jsonResponse([
                 'access_token' => $jwt,
-                'user' => $userWithRoles,
+                'user_with_roles' => $userWithRoles,
             ], 200, $response);
         } catch (DatabaseException $e) {
             return JsonResponseHelper::jsonResponse('Token refresh failed: ' . $e->getMessage(), 500, $response);

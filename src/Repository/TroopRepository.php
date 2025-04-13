@@ -50,7 +50,7 @@ class TroopRepository extends GenericRepository {
             g.name AS patrol_name,
             g.color AS patrol_color,
             
-            t.id_troop AS troop_id,
+            t.id_troop AS id_troop,
             t.name AS troop_name,
             
             u.nickname,

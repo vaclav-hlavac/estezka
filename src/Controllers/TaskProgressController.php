@@ -3,7 +3,9 @@
 namespace App\Controllers;
 
 use App\Exceptions\DatabaseException;
+use App\Exceptions\NotFoundException;
 use App\Models\Notification;
+use App\Models\Roles\GangMember;
 use App\Models\Task;
 use App\Models\TaskProgress;
 use App\Models\Wrappers\TaskProgressWithTask;
@@ -16,6 +18,8 @@ use App\Repository\TaskRepository;
 use App\Repository\TroopRepository;
 use App\Repository\UserRepository;
 use App\Utils\JsonResponseHelper;
+use DateTime;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 
 class TaskProgressController extends CRUDController
@@ -36,30 +40,30 @@ class TaskProgressController extends CRUDController
      * @return ResponseInterface JSON response containing an array of task progress records
      *                           with associated task details, or an error message.
      */
-    public function getUserTaskProgress($request, $response, $args)
+    public function getUserTaskProgresses($request, $response, $args)
     {
         $userId = (int)($args['id_user'] ?? 0);
         $troopId = (int)($args['id_troop'] ?? 0);
 
-        try {
-            $troopRepository = new TroopRepository($this->pdo);
+        $troopRepository = new TroopRepository($this->pdo);
 
-            if (!$troopRepository->isUserGangMemberInTroop($userId, $troopId)) {
-                return JsonResponseHelper::jsonResponse("Uživatel není člen družiny v tomto oddíle.", 403, $response);
+        if (!$troopRepository->isUserGangMemberInTroop($userId, $troopId)) {
+            return JsonResponseHelper::jsonResponse("Uživatel není člen družiny v tomto oddíle.", 403, $response);
+        }
+
+        $progressArray = $this->repository->findAllByIdUser($userId);
+        $taskRepo = new TaskRepository($this->pdo);
+
+        $combined = [];
+        foreach ($progressArray as $progress) {
+            if($progress->id_confirmed_by != null){ //adding nickname of user that confirmed to response
+                $userRepo = new UserRepository($this->pdo);
+                $user = $userRepo->findById($progress->id_confirmed_by);
+                $progress->confirmed_by_nickname = $user->nickname;
             }
 
-
-            $progressArray = $this->repository->findAllByIdUser($userId);
-            $taskRepo = new TaskRepository($this->pdo);
-
-            $combined = [];
-            foreach ($progressArray as $progress) {
-                $task = $taskRepo->findById($progress->id_task);
-                $combined[] = new TaskProgressWithTask($progress, $task);
-            }
-
-        } catch (DatabaseException $e) {
-            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
+            $task = $taskRepo->findById($progress->id_task);
+            $combined[] = new TaskProgressWithTask($progress, $task);
         }
 
         return JsonResponseHelper::jsonResponse($combined, 200, $response);
@@ -82,7 +86,15 @@ class TaskProgressController extends CRUDController
         $troopId = (int) $args['id_troop'];
         $taskProgressId = (int) $args['id_task_progress'];
 
-        $data = $request->getParsedBody();
+        $rawBody = $request->getBody()->getContents();
+        $data = json_decode($rawBody, true);
+
+        foreach (['signed_at', 'confirmed_at', 'planned_to'] as $field) {
+            if (!empty($data[$field]) && is_string($data[$field])) {
+                $data[$field] = new DateTime($data[$field]);
+            }
+        }
+
         if (empty($data)) {
             return JsonResponseHelper::jsonResponse("No data provided", 400, $response);
         }
@@ -100,7 +112,7 @@ class TaskProgressController extends CRUDController
 
         $taskRepo = new TaskRepository($this->pdo);
         $task = $taskRepo->findById($taskProgress->id_task);
-        if (!$task || $task->id_troop !== $troopId) {
+        if (!$task || ($task->id_troop != null && $task->id_troop !== $troopId)) {
             return JsonResponseHelper::jsonResponse("Task does not belong to the specified troop", 403, $response);
         }
 
@@ -109,11 +121,50 @@ class TaskProgressController extends CRUDController
         $updated = $repository->update($taskProgressId, $taskProgress->toDatabase());
 
         // Send notifications only if the status changed from something to "signed"
+        $gangMemberRepo = new GangMemberRepository($this->pdo);
+        $gangMember = $gangMemberRepo->findById($userId);
         if ($oldStatus !== 'signed' && $taskProgress->status === 'signed') {
-            $this->notifyLeadersAboutTaskStatusChange($taskProgress, $task->id_troop);
+            $this->notifyLeadersAboutTaskStatusChange($taskProgress, $gangMember->id_troop);
         }
 
         return JsonResponseHelper::jsonResponse($updated, 200, $response);
+    }
+
+    /**
+     * Returns a specific TaskProgressWithTask by its ID.
+     *
+     * @param Request $request   The HTTP request object.
+     * @param Response $response The HTTP response object.
+     * @param array $args        Route parameters containing 'id_task_progress'.
+     *
+     * @return ResponseInterface JSON response containing a single task progress with task details, or an error message.
+     */
+    public function getUserTaskProgressById($request, $response, $args)
+    {
+        $taskProgressId = (int)($args['id_task_progress'] ?? 0);
+
+        $taskProgress = $this->repository->findById($taskProgressId);
+
+        if (!$taskProgress) {
+            throw new NotFoundException("Progres nenalezen.", 404);
+        }
+
+        //adding nickname of user that confirmed to response
+        if($taskProgress->id_confirmed_by != null){
+            $userRepo = new UserRepository($this->pdo);
+            $user = $userRepo->findById($taskProgress->id_confirmed_by);
+            $taskProgress->confirmed_by_nickname = $user->nickname;
+        }
+
+        $taskRepo = new TaskRepository($this->pdo);
+        $task = $taskRepo->findById($taskProgress->id_task);
+
+        if (!$task) {
+            throw new NotFoundException("Úkol spojený s tímto progresem nebyl nalezen.", 404);
+        }
+
+        $combined = new TaskProgressWithTask($taskProgress, $task);
+        return JsonResponseHelper::jsonResponse($combined, 200, $response);
     }
 
 
@@ -143,7 +194,7 @@ class TaskProgressController extends CRUDController
         $task = $taskRepository->findById($taskProgress->id_task);
 
         // Prepare notification text
-        $text = "Splněný úkol: \"$task->title\".";
+        $text = "Splněný úkol: \"$task->name\".";
 
         $userRepository = new UserRepository($this->pdo);
         $user = $userRepository->findById($taskProgress->id_user);

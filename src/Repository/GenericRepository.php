@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Exceptions\DatabaseException;
+use DateTime;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -31,7 +32,7 @@ abstract class GenericRepository {
 
     /**
      * @param int $id
-     * @return object|null
+     * @return T|null
      * @throws DatabaseException
      */
     public function findById(int $id): ?object {
@@ -70,8 +71,13 @@ abstract class GenericRepository {
         $placeholders = implode(", ", array_map(fn($key) => ":$key", array_keys($data)));
 
         $stmt = $this->pdo->prepare("INSERT INTO {$this->table} ($columns) VALUES ($placeholders)");
+
         try {
-            $stmt->execute($data);
+            foreach ($data as $key => $value) {
+                $stmt->bindValue(":$key", $value);
+            }
+
+            $stmt->execute();
         } catch (PDOException $e) {
             throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
         }
@@ -81,6 +87,7 @@ abstract class GenericRepository {
         return $this->findById($insertedId);
     }
 
+
     /**
      * Aktualizuje záznam v databázi.
      * @param int $id
@@ -88,19 +95,25 @@ abstract class GenericRepository {
      * @return object|null
      * @throws DatabaseException
      */
-    public function update(int $id, array $data): ?object {
+    public function update(int $id, array $data): ?object
+    {
         $fields = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($data)));
         $data[$this->primaryKey] = $id;
 
         $stmt = $this->pdo->prepare("UPDATE {$this->table} SET $fields WHERE {$this->primaryKey} = :{$this->primaryKey}");
 
         try {
-            $stmt->execute($data);
+            // Manual binding
+            foreach ($data as $key => $value) {
+                $stmt->bindValue(":$key", $value);
+            }
+
+            $stmt->execute();
         } catch (PDOException $e) {
             throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
         }
 
-        return $this->findById((int) $this->pdo->lastInsertId());
+        return $this->findById($id);
     }
 
     /**

@@ -54,20 +54,22 @@ return function (App $app) {
         $tasks->get('/{id}', [$taskController, 'getById']);
     });
 
-    //************************* USER ****************************************
-    //todo only for testing
-    $userController = new UserController($pdo);
 
-    $app->group('/users', function ($tasks) use ($userController) {
-        $tasks->get('', [$userController, 'getAll']);
-
-        $tasks->get('/{id}', [$userController, 'getById']);
-    });
 
     //************************************************************************
     //************************* NON-PUBLIC ROUTES ****************************
     //************************************************************************
 
+    //************************* USER ****************************************
+    $userController = new UserController($pdo);
+
+    $app->group('/users', function ($users) use ($userController) {
+        $users->get('', [$userController, 'getAll']);
+
+        $users->get('/{id}', [$userController, 'getById']);
+        $users->patch('/me', [$userController, 'updateSelf']);
+
+    })->add(new AuthMiddleware());
 
     //************************* TROOP ****************************************
     $troopController = new TroopController($pdo);
@@ -93,9 +95,14 @@ return function (App $app) {
     $taskProgressController = new TaskProgressController($pdo);
 
     $app->group('/troops/{id_troop}/members/{id_user}/task-progresses', function ($task_progresses) use ($taskProgressController) {
-        $task_progresses->get('', [$taskProgressController, 'getUserTaskProgress']);
+        $task_progresses->get('', [$taskProgressController, 'getUserTaskProgresses']);
         $task_progresses->patch('/{id_task_progress}', [$taskProgressController, 'updateUserTaskProgress']);
 
+    })->add(new AuthMiddleware());
+
+    $app->group('/task-progresses', function ($task_progresses) use ($taskProgressController) {
+        $task_progresses->get('/{id_task_progress}', [$taskProgressController, 'getUserTaskProgressById']);
+        $task_progresses->patch('/{id_task_progress}', [$taskProgressController, 'updateUserTaskProgress']);
 
     })->add(new AuthMiddleware());
 
@@ -141,8 +148,6 @@ return function (App $app) {
         $gangs->delete('/{id}', [$gangController, 'delete']);
 
     })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
-
-
 
 
     //************************* NON-EXISTING **********************************

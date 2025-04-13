@@ -3,10 +3,15 @@
 namespace App\Controllers;
 
 use App\Exceptions\DatabaseException;
+use App\Exceptions\NotFoundException;
 use App\Models\Notification;
 use App\Models\Wrappers\NotificationResponse;
+use App\Models\Wrappers\NotificationWithPatrolMember;
+use App\Models\Wrappers\NotificationWithUser;
 use App\Repository\NotificationRepository;
+use App\Repository\Roles\GangMemberRepository;
 use App\Repository\TaskProgressRepository;
+use App\Repository\UserRepository;
 use App\Utils\JsonResponseHelper;
 use InvalidArgumentException;
 use PDO;
@@ -30,25 +35,30 @@ class NotificationController
      */
     public function getAllForUser(Request $request, Response $response, array $args): Response
     {
-        try {
-            $userId = (int) $args['id_user'];
-            $notifications = $this->repository->findAllForReceiver($userId);
+        $userId = (int) $args['id_user'];
 
-            $taskProgressRepo = new TaskProgressRepository($this->pdo);
-            $responses = [];
+        $notifications = $this->repository->findAllForReceiver($userId);
 
-            foreach ($notifications as $notification) {
-                $taskProgress = $notification->id_task_progress
-                    ? $taskProgressRepo->findById($notification->id_task_progress)
-                    : null;
+        $gangMemberRepo = new GangMemberRepository($this->pdo);
+        $userRepo = new UserRepository($this->pdo);
 
-                $responses[] = new NotificationResponse($notification, $taskProgress);
+        $responses = [];
+
+        // Finding creator - firstly as patrolMember, then at least as user
+        foreach ($notifications as $notification) {
+            $patrolMember = $gangMemberRepo->findById($notification->id_user_creator);
+
+            if ($patrolMember !== null) {
+                // User is a Patrol Member
+                $responses[] = new NotificationWithPatrolMember($notification, $patrolMember);
+            } else {
+                // User is not a Patrol Member
+                $user = $userRepo->findById($notification->id_user_creator);
+                $responses[] = new NotificationWithUser($notification, $user);
             }
-
-            return JsonResponseHelper::jsonResponse($responses, 200, $response);
-        } catch (DatabaseException $e) {
-            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
+
+        return JsonResponseHelper::jsonResponse($responses, 200, $response);
     }
 
     /**
@@ -75,23 +85,20 @@ class NotificationController
      */
     public function update(Request $request, Response $response, array $args): Response
     {
+        $rawBody = $request->getBody()->getContents();
+        $data = json_decode($rawBody, true);
+
         $id = (int) $args['id_notification'];
-        $data = $request->getParsedBody();
 
-        try {
-            $notification = $this->repository->findById($id);
-
-            if (!$notification) {
-                return JsonResponseHelper::jsonResponse("Notification not found", 404, $response);
-            }
-
-            $notification->setAttributes($data);
-
-            $updated = $this->repository->update($notification->getId(), $notification->toDatabase());
-
-            return JsonResponseHelper::jsonResponse($updated, 200, $response);
-        } catch (DatabaseException|InvalidArgumentException $e) {
-            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
+        $notification = $this->repository->findById($id);
+        if (!$notification) {
+            throw new NotFoundException('Notification not found', 404);
         }
+
+        $notification->setAttributes($data);
+        $updated = $this->repository->update($notification->getId(), $notification->toDatabase());
+
+        return JsonResponseHelper::jsonResponse($updated, 200, $response);
+
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use InvalidArgumentException;
-use Symfony\Component\Console\Color;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -37,16 +36,17 @@ class User extends BaseModel {
             'name' => $this->name,
             'surname' => $this->surname,
             'email' => $this->email,
-            'notifications_enabled' => $this->notifications_enabled,
+            'notifications_enabled' => $this->formatForDatabase($this->notifications_enabled),
         ];
 
-        if ($this->id_user != null) { $data['id_user'] = $this->id_user;}
+        if ($this->id_user !== null) {
+            $data['id_user'] = $this->id_user;
+        }
 
         return $data;
     }
 
-    public function jsonSerialize(): mixed
-    {
+    public function jsonSerialize(): mixed {
         $data = [
             'nickname' => $this->nickname,
             'name' => $this->name,
@@ -55,8 +55,9 @@ class User extends BaseModel {
             'notifications_enabled' => $this->notifications_enabled,
         ];
 
-        if ($this->id_user != null) { $data['id_user'] = $this->id_user;}
-
+        if ($this->id_user !== null) {
+            $data['id_user'] = $this->id_user;
+        }
         return $data;
     }
 
@@ -64,12 +65,11 @@ class User extends BaseModel {
         return [
             'id_user' => $this->id_user,
             'email' => $this->email,
-            'exp' => time() + 60000 // Token expires in cca 2 hours
+            'exp' => time() + 6000 // Token expires in cca 2 hours
         ];
     }
 
-    public function getId()
-    {
+    public function getId() {
         return $this->id_user;
     }
 }

@@ -12,6 +12,7 @@ use App\Repository\Roles\GangMemberRepository;
 use App\Repository\Roles\GangLeaderRepository;
 use App\Repository\Roles\TroopLeaderRepository;
 use App\Exceptions\DatabaseException;
+use DI\NotFoundException;
 use PDO;
 
 class UserRolesService
@@ -34,14 +35,14 @@ class UserRolesService
      *
      * @param int $userId
      * @return UserWithRoles|null
-     * @throws DatabaseException
+     * @throws DatabaseException|NotFoundException
      */
     public function loadByUserId(int $userId): ?UserWithRoles
     {
         // 1. Load user
         $user = $this->userRepository->findById($userId);
         if (!$user) {
-            return null; // user not found
+            throw new NotFoundException('User not found', 404);
         }
 
         // 2. Load optional roles
