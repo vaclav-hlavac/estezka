@@ -200,6 +200,4 @@ class TaskProgressRepository extends GenericRepository {
             throw new DatabaseException("Chyba při získávání task_progress pro uživatele: " . $e->getMessage(), 500, $e);
         }
     }
-
-
 }

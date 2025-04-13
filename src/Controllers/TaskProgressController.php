@@ -216,4 +216,54 @@ class TaskProgressController extends CRUDController
         }
     }
 
+    /**
+     * Retrieves all TaskProgress entries for all members of a specific troop.
+     *
+     * For each gang member (patrol member) in the troop, this method finds their task progresses
+     * and attaches the corresponding task information. The combined results are returned
+     * as an array of TaskProgressWithTask objects.
+     *
+     * Endpoint: GET /troops/{id_troop}/task-progresses
+     *
+     * @param Request  $request   The HTTP request object.
+     * @param Response $response  The HTTP response object.
+     * @param array    $args      Route parameters containing 'id_troop'.
+     *
+     * @return ResponseInterface  JSON response containing a list of TaskProgressWithTask objects,
+     *                             or an error message if the troop is not found.
+     *
+     * @throws NotFoundException if the specified troop does not exist.
+     */
+    public function getTaskProgressesByTroop($request, $response, $args)
+    {
+        $troopId = (int)($args['id_troop'] ?? 0);
+
+        // Check if troop exists
+        $troopRepo = new TroopRepository($this->pdo);
+        $troop = $troopRepo->findById($troopId);
+        if (!$troop) {
+            throw new NotFoundException("Troop not found.", 404);
+        }
+
+        //find troop members
+        $gangMemberRepo = new GangMemberRepository($this->pdo);
+        $gangMembers = $gangMemberRepo->findAllByTroopId($troopId);
+
+        //find progresses
+        $taskProgresses = [];
+        $taskProgressRepo = new TaskProgressRepository($this->pdo);
+        $taskRepo = new TaskRepository($this->pdo);
+
+        foreach ($gangMembers as $member) {
+            $progressList = $taskProgressRepo->findAllByIdUser($member->id_user);
+            foreach ($progressList as $progress) {
+                $task = $taskRepo->findById($progress->id_task);
+                if ($task) {
+                    $taskProgresses[] = new TaskProgressWithTask($progress, $task);
+                }
+            }
+        }
+
+        return JsonResponseHelper::jsonResponse($taskProgresses, 200, $response);
+    }
 }

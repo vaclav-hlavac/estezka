@@ -9,6 +9,7 @@ class Gang extends BaseModel
     public string $name;
     public int $id_troop;
     public ?int $id_gang;
+    public ?string $color;
     public string $invite_code;
 
     /**
@@ -25,6 +26,7 @@ class Gang extends BaseModel
         $this->id_troop = $data['id_troop'];
         $this->id_gang = $data['id_patrol'] ?? null;
         $this->invite_code = bin2hex(random_bytes(5));
+        $this->color = $data['color'] ?? null;
     }
 
     public function jsonSerialize(): mixed
@@ -36,6 +38,7 @@ class Gang extends BaseModel
         ];
 
         if ($this->id_gang != null) { $data['id_patrol'] = $this->id_gang;}
+        if ($this->color != null) { $data['color'] = $this->color;}
 
         return $data;
     }

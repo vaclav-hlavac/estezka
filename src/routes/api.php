@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use App\Config\Database;
 use App\Controllers\AuthController;
 use App\Controllers\GangController;
+use App\Controllers\GangLeaderController;
 use App\Controllers\NotificationController;
 use App\Controllers\TaskProgressController;
 use App\Controllers\UserController;
@@ -85,7 +86,6 @@ return function (App $app) {
 
         $troops->get('/{id}/members', [$troopController, 'getTroopMembers']);
 
-
         $troops->get('/{id}/patrols', [$troopController, 'getTroopGangs']);
         $troops->post('/{id}/patrols', [$troopController, 'createGang']);
     })->add(new AuthMiddleware()); //adds authorization middleware
@@ -94,9 +94,11 @@ return function (App $app) {
     //************************* TASK-PROGRESSES ****************************************
     $taskProgressController = new TaskProgressController($pdo);
 
-    $app->group('/troops/{id_troop}/members/{id_user}/task-progresses', function ($task_progresses) use ($taskProgressController) {
-        $task_progresses->get('', [$taskProgressController, 'getUserTaskProgresses']);
-        $task_progresses->patch('/{id_task_progress}', [$taskProgressController, 'updateUserTaskProgress']);
+    $app->group('/troops/{id_troop}', function ($task_progresses) use ($taskProgressController) {
+        $task_progresses->get('/task-progresses', [$taskProgressController, 'getTaskProgressesByTroop']);
+
+        $task_progresses->get('/members/{id_user}/task-progresses', [$taskProgressController, 'getUserTaskProgresses']);
+        $task_progresses->patch('/members/{id_user}/task-progresses/{id_task_progress}', [$taskProgressController, 'updateUserTaskProgress']);
 
     })->add(new AuthMiddleware());
 
@@ -124,11 +126,9 @@ return function (App $app) {
     //$accesService = new AccessService(); todo
 
     $app->group('/troops', function ($troops) use ($gangController) {
+        $troops->post('/{id_troop}/patrols', [$gangController, 'addPatrolToTroop']);
+
         $troops->get('/{id_troop}/patrols/{id_patrol}/members', [$gangController, 'getGangMembers']);
-        $troops->post('/{id_troop}/patrols/{id_patrol}/members', [$gangController, 'addGangMember']); //todo
-        $troops->delete('/{id_troop}/patrols/{id_patrol}/members/{id_user}', [$gangController, 'deleteGangMember']); //todo
-
-
     })->add(new AuthMiddleware()); //adds authorization middleware
 
     //************************* TASK ****************************************
@@ -140,13 +140,19 @@ return function (App $app) {
     })->add(new AuthMiddleware()); //adds authorization middleware
 
 
-    //************************* GANG ****************************************
+    //************************* PATROL ****************************************
     $gangController = new GangController($pdo);
 
     $app->group('/patrols', function ($gangs) use ($gangController) {
         $gangs->patch('/{id}', [$gangController, 'update']);
         $gangs->delete('/{id}', [$gangController, 'delete']);
+    })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
 
+    //************************* PATROL LEADERS ****************************************
+    $gangLeaderController = new GangLeaderController($pdo);
+
+    $app->group('/patrols', function ($gangs) use ($gangLeaderController) {
+        $gangs->post('/{id_patrol}/leaders', [$gangLeaderController, 'addPatrolLeader']); //todo
     })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
 
 
