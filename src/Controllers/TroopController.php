@@ -64,7 +64,7 @@ class TroopController extends CRUDController
 
 
         //creating new gang
-        $data['troopId'] = $args['id'];
+        $data['id_troop'] = $args['id'];
         $gang = new Gang($data);
         $gangRepository = new GangRepository($this->pdo);
 

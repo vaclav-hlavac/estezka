@@ -8,7 +8,7 @@ class Gang extends BaseModel
 {
     public string $name;
     public int $id_troop;
-    public ?int $id_gang;
+    public ?int $id_patrol;
     public ?string $color;
     public string $invite_code;
 
@@ -24,7 +24,7 @@ class Gang extends BaseModel
 
         $this->name = $data['name'];
         $this->id_troop = $data['id_troop'];
-        $this->id_gang = $data['id_patrol'] ?? null;
+        $this->id_patrol = $data['id_patrol'] ?? null;
         $this->invite_code = bin2hex(random_bytes(5));
         $this->color = $data['color'] ?? null;
     }
@@ -37,7 +37,7 @@ class Gang extends BaseModel
             'invite_code' => $this->invite_code,
         ];
 
-        if ($this->id_gang != null) { $data['id_patrol'] = $this->id_gang;}
+        if ($this->id_patrol != null) { $data['id_patrol'] = $this->id_patrol;}
         if ($this->color != null) { $data['color'] = $this->color;}
 
         return $data;
@@ -45,7 +45,7 @@ class Gang extends BaseModel
 
     public function getId()
     {
-        return $this->id_gang;
+        return $this->id_patrol;
     }
 
     public function refreshInviteCode(){

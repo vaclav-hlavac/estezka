@@ -93,7 +93,7 @@ abstract class CRUDController
 
         // set new attributes and update
         $foundObject->setAttributes($data);
-        $updatedObject = $this->repository->update($foundObject->getId(), $foundObject->jsonSerialize()); // todo toArray??
+        $updatedObject = $this->repository->update($foundObject->getId(), $foundObject->toDatabase());
 
         // response
         if ($updatedObject) {

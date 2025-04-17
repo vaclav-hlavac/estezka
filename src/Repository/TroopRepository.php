@@ -66,7 +66,7 @@ class TroopRepository extends GenericRepository {
                 SELECT COUNT(*) 
                 FROM task_progress tp 
                 WHERE tp.id_user = gm.id_user 
-                AND tp.status = 'completed'
+                AND tp.status = 'confirmed'
             ) AS completed_tasks
         FROM patrol_member gm
         INNER JOIN patrol g ON gm.id_patrol = g.id_patrol

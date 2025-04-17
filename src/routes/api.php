@@ -7,6 +7,7 @@ use App\Controllers\AuthController;
 use App\Controllers\GangController;
 use App\Controllers\GangLeaderController;
 use App\Controllers\NotificationController;
+use App\Controllers\PatrolMemberController;
 use App\Controllers\TaskProgressController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
@@ -126,7 +127,7 @@ return function (App $app) {
     //$accesService = new AccessService(); todo
 
     $app->group('/troops', function ($troops) use ($gangController) {
-        $troops->post('/{id_troop}/patrols', [$gangController, 'addPatrolToTroop']);
+/*        $troops->post('/{id_troop}/patrols', [$gangController, 'addPatrolToTroop']);*/
 
         $troops->get('/{id_troop}/patrols/{id_patrol}/members', [$gangController, 'getGangMembers']);
     })->add(new AuthMiddleware()); //adds authorization middleware
@@ -149,10 +150,17 @@ return function (App $app) {
     })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
 
     //************************* PATROL LEADERS ****************************************
+    $gangLeaderController = new PatrolMemberController($pdo);
+
+    $app->group('/patrols', function ($gangs) use ($gangLeaderController) {
+        $gangs->patch('/{id_patrol}/members/{id_user}', [$gangLeaderController, 'changePatrol']);
+    })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
+
+    //************************* PATROL LEADERS ****************************************
     $gangLeaderController = new GangLeaderController($pdo);
 
     $app->group('/patrols', function ($gangs) use ($gangLeaderController) {
-        $gangs->post('/{id_patrol}/leaders', [$gangLeaderController, 'addPatrolLeader']); //todo
+        $gangs->post('/{id_patrol}/leaders', [$gangLeaderController, 'addPatrolLeader']);
     })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
 
 

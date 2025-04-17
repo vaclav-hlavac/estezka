@@ -3,7 +3,7 @@
         'name' => 'abe/estezka',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '494246b383f7a83f16316e120f5f5f7af06e5119',
+        'reference' => '7e73cceaabd82c448a3eecf7b356d208c6aa696b',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'abe/estezka' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '494246b383f7a83f16316e120f5f5f7af06e5119',
+            'reference' => '7e73cceaabd82c448a3eecf7b356d208c6aa696b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 class GangMember extends BaseModel
 {
-    public int $id_gang;
+    public int $id_patrol;
     public int $id_user;
 
     public ?string $nickname;
@@ -26,7 +26,7 @@ class GangMember extends BaseModel
         $this->requiredArgumentsControl($data, $notNullArguments);
 
         $this->id_user = $data['id_user'];
-        $this->id_gang = $data['id_patrol'];
+        $this->id_patrol = $data['id_patrol'];
 
         // Optional fields
         $this->nickname = $data['nickname'] ?? null;
@@ -48,7 +48,7 @@ class GangMember extends BaseModel
 
         return [
             'id_user' => $this->id_user,
-            'id_patrol' => $this->id_gang,
+            'id_patrol' => $this->id_patrol,
             'nickname' => $this->nickname,
             'avatar_url' => $this->avatar_url,
             'patrol_name' => $this->gang_name,
@@ -70,7 +70,7 @@ class GangMember extends BaseModel
     {
         return [
             'id_user' => $this->id_user,
-            'id_patrol' => $this->id_gang,
+            'id_patrol' => $this->id_patrol,
         ];
     }
 
