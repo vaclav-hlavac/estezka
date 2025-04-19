@@ -97,6 +97,10 @@ abstract class GenericRepository {
      */
     public function update(int $id, array $data): ?object
     {
+        if (empty($data)) {
+            throw new RuntimeException("No data provided for update");
+        }
+
         $fields = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($data)));
         $data[$this->primaryKey] = $id;
 
@@ -133,10 +137,14 @@ abstract class GenericRepository {
 
     /**
      * Vytvoří instanci modelu dynamicky.
-     * @param array $data
-     * @return object
+     * @param array|false|null $data
+     * @return object|null
      */
-    protected function hydrateModel(array $data): object {
+    protected function hydrateModel(null|array|false $data): ?object {
+        if ($data === false || $data === null) {
+            return null;
+        }
+
         return new $this->modelClass($data);
     }
 }

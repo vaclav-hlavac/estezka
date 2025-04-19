@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use App\Repository\UserRepository;
 use App\Models\User;
 use PDO;
+use Tests\TestUtils\DatabaseCleaner;
 
 final class UserRepositoryTest extends TestCase
 {
@@ -20,9 +21,7 @@ final class UserRepositoryTest extends TestCase
         $this->repository = $container->get(UserRepository::class);
         $this->pdo = $container->get(PDO::class);
 
-        // Clean user table
-        $this->pdo->exec("DELETE FROM user");
-        $this->pdo->exec("ALTER TABLE user AUTO_INCREMENT = 1");
+        DatabaseCleaner::cleanAll($this->pdo);
     }
 
     /**

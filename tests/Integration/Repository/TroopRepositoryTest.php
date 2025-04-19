@@ -6,30 +6,25 @@ use App\Models\Roles\GangMember;
 use App\Repository\TroopRepository;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Tests\TestUtils\DatabaseCleaner;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-class TroopRepositoryTest extends TestCase
+final class TroopRepositoryTest extends TestCase
 {
     private PDO $pdo;
     private TroopRepository $repository;
 
     protected function setUp(): void
     {
-        $this->pdo = new PDO('mysql:host=localhost;dbname=e_stezka_test', 'root', '');
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $container = require __DIR__ . '/../../../tests/bootstrap.php';
 
-        $this->resetDatabase();
+        $this->repository = $container->get(TroopRepository::class);
+        $this->pdo = $container->get(PDO::class);
+
+        DatabaseCleaner::cleanAll($this->pdo);
+
         $this->seedData();
-
-        $this->repository = new TroopRepository($this->pdo);
     }
 
-    private function resetDatabase(): void
-    {
-        $sql = file_get_contents(__DIR__ . '/../../create-script.sql');
-        $this->pdo->exec($sql);
-    }
 
     private function seedData(): void
     {

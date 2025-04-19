@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use App\Repository\NotificationRepository;
 use App\Models\Notification;
 use PDO;
+use Tests\TestUtils\DatabaseCleaner;
 
 final class NotificationRepositoryTest extends TestCase
 {
@@ -21,9 +22,7 @@ final class NotificationRepositoryTest extends TestCase
         $this->pdo = $container->get(PDO::class);
 
         // Clean up test data
-        $this->pdo->exec("DELETE FROM notification");
-        $this->pdo->exec("DELETE FROM user");
-        $this->pdo->exec("ALTER TABLE notification AUTO_INCREMENT = 1");
+        DatabaseCleaner::cleanAll($this->pdo);
 
         // Insert test users
         $this->pdo->prepare("

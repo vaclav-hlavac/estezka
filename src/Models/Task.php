@@ -10,12 +10,13 @@ class Task extends BaseModel {
     public string $description;
     public string $category;
     public string $subcategory;
+    public int $path_level;
     public ?string $tag;
     public ?int $id_troop;
 
 
     public function __construct(array $data) {
-        $notNullArguments = ['number'];
+        $notNullArguments = ['number', 'path_level'];
         $notEmptyArguments = ['name', 'description', 'category', 'subcategory'];
         $this->requiredArgumentsControl($data, $notNullArguments, $notEmptyArguments);
 
@@ -24,6 +25,7 @@ class Task extends BaseModel {
         $this->description = $data['description'];
         $this->category = $data['category'];
         $this->subcategory = $data['subcategory'];
+        $this->path_level = $data['path_level'];
         $this->tag = $data['tag'] ?? null;
         $this->id_troop = $data['id_troop'] ?? null;
         $this->id_task = $data['id_task'] ?? null;
@@ -37,6 +39,7 @@ class Task extends BaseModel {
             'description' => $this->description,
             'category' => $this->category,
             'subcategory' => $this->subcategory,
+            'path_level' => $this->path_level,
         ];
 
         if ($this->id_troop != null) { $data['id_troop'] = $this->id_troop;}

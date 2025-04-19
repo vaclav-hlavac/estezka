@@ -47,7 +47,10 @@ class RefreshTokenRepository extends GenericRepository
             throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
         }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $this->hydrateModel($result);
+        if (!$result || !isset($result['id_user'])) {
+            throw new DatabaseException("Token not found", 404);
+        }
+        return (int) $result['id_user'];
     }
 
 }
