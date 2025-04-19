@@ -3,7 +3,6 @@
 namespace App\Models\Wrappers;
 
 use App\Models\Notification;
-use App\Models\Roles\GangMember;
 use App\Models\User;
 use JsonSerializable;
 

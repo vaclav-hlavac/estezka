@@ -4,6 +4,8 @@ use App\Config\Database;
 use App\Middleware\ErrorHandlerMiddleware;
 use App\Repository\CommentRepository;
 use App\Repository\GangRepository;
+use App\Repository\NotificationRepository;
+use App\Repository\RefreshTokenRepository;
 use App\Repository\TaskProgressRepository;
 use App\Repository\TaskRepository;
 use App\Repository\TroopRepository;
@@ -19,16 +21,16 @@ use App\Services\AccessService;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// LOAD .ENV
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-
+if (!isset($_ENV['APP_ENV'])) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+}
 
 
 // **** DEPENDENCY INJECTION *****
 $container = new Container();
 
-// PDO
+
 $container->set(PDO::class, function (ContainerInterface $c) {
     return Database::connect();
 });
@@ -41,6 +43,9 @@ $container->set(TaskProgressRepository::class, fn(ContainerInterface $c) => new 
 $container->set(TaskRepository::class, fn(ContainerInterface $c) => new TaskRepository($c->get(PDO::class)));
 $container->set(TroopRepository::class, fn(ContainerInterface $c) => new TroopRepository($c->get(PDO::class)));
 $container->set(UserRepository::class, fn(ContainerInterface $c) => new UserRepository($c->get(PDO::class)));
+$container->set(NotificationRepository::class, fn(ContainerInterface $c) => new NotificationRepository($c->get(PDO::class)));
+$container->set(RefreshTokenRepository::class, fn(ContainerInterface $c) => new RefreshTokenRepository($c->get(PDO::class)));
+
 
 
 // SERVICES

@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Exceptions\DatabaseException;
 use App\Exceptions\NotFoundException;
 use App\Models\Notification;
-use App\Models\Wrappers\NotificationResponse;
 use App\Models\Wrappers\NotificationWithPatrolMember;
 use App\Models\Wrappers\NotificationWithUser;
 use App\Repository\NotificationRepository;

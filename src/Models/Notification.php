@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DateTime;
 use DateTimeInterface;
 
 class Notification extends BaseModel
@@ -14,8 +15,8 @@ class Notification extends BaseModel
     public string $type;
 
     public ?int $id_task_progress;
-    public ?\DateTime $created_at;
-    public ?\DateTime $updated_at;
+    public ?DateTime $created_at;
+    public ?DateTime $updated_at;
 
     public function __construct(array $data)
     {
@@ -35,7 +36,7 @@ class Notification extends BaseModel
 
     public function toDatabase(): array
     {
-        return [
+        $data = [
             'id_user_creator' => $this->id_user_creator,
             'id_user_receiver' => $this->id_user_receiver,
             'text' => $this->text,
@@ -43,6 +44,7 @@ class Notification extends BaseModel
             'id_task_progress' => $this->id_task_progress,
             'type' => $this->type,
         ];
+        return $data;
     }
 
     public function jsonSerialize(): mixed

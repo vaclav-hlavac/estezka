@@ -16,23 +16,6 @@ class UserRepository extends GenericRepository {
         parent::__construct($pdo, 'user', 'id_user', User::class);
     }
 
-    /**
-     * @param $loginName
-     * @return User|null
-     * @throws DatabaseException
-     */
-    public function findByLoginName($loginName): ?User {
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE login_name = ?");
-
-        try{
-            $stmt->execute([$loginName]);
-        } catch (PDOException $e) {
-            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
-        }
-
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ? $this->hydrateModel($result) : null;
-    }
 
     /**
      * @param $email
