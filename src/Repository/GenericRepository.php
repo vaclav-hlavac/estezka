@@ -140,8 +140,8 @@ abstract class GenericRepository {
      * @param array|false|null $data
      * @return object|null
      */
-    protected function hydrateModel(null|array|false $data): ?object {
-        if ($data === false || $data === null) {
+    protected function hydrateModel(array|false|null $data): ?object {
+        if (!$data) {
             return null;
         }
 

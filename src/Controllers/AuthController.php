@@ -85,7 +85,7 @@ class AuthController {
                 }
             }
         } catch (Exception $e) {
-            $userRepository->delete($user->getId());
+            $userRepository->delete($savedUser->getId());
             return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
         }
 
@@ -226,13 +226,13 @@ class AuthController {
         // Creating new troop
         $troop = new Troop($data['new_troop']);
         $troopRepository = new TroopRepository($this->pdo);
-        $troopRepository->insert($troop->toDatabase());
+        $newTroop = $troopRepository->insert($troop->toDatabase());
 
         // Setting TroopLeader role
         $troopLeaderRepository = new TroopLeaderRepository($this->pdo);
         $troopLeader = new TroopLeader([
             "id_user" => $savedUser->getId(),
-            "id_troop" => $data['id_troop']
+            "id_troop" => $newTroop->getId()
         ]);
         $troopLeaderRepository->insert($troopLeader->toDatabase());
     }
