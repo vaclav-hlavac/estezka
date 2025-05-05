@@ -16,6 +16,7 @@ class TaskProgress extends BaseModel
     public ?DateTime $signed_at;
     public ?string $witness;
     public ?int $id_confirmed_by;
+    public ?String $filled_text;
     public ?String $confirmed_by_nickname;
     public ?DateTime $confirmed_at;
     public ?int $id_task_progress;
@@ -33,6 +34,7 @@ class TaskProgress extends BaseModel
         $this->planned_to = $this->convertToDateTimeIfNeeded($data['planned_to'] ?? null);
         $this->signed_at = $this->convertToDateTimeIfNeeded($data['signed_at'] ?? null);
         $this->witness = $data['witness'] ?? null;
+        $this->filled_text = $data['filled_text'] ?? null;
         $this->id_confirmed_by = $data['id_confirmed_by'] ?? null;
         $this->confirmed_by_nickname = $data['confirmed_by_nickname'] ?? null;
         $this->confirmed_at = $this->convertToDateTimeIfNeeded($data['confirmed_at'] ?? null);
@@ -53,6 +55,7 @@ class TaskProgress extends BaseModel
         if ($this->id_confirmed_by !== null) { $data['id_confirmed_by'] = $this->id_confirmed_by; }
         if ($this->confirmed_at !== null) { $data['confirmed_at'] = $this->confirmed_at->format(DateTimeInterface::ATOM); }
         if ($this->confirmed_by_nickname !== null) { $data['confirmed_by_nickname'] = $this->confirmed_by_nickname; }
+        if ($this->filled_text !== null) { $data['filled_text'] = $this->filled_text; }
 
         return $data;
     }
@@ -76,6 +79,7 @@ class TaskProgress extends BaseModel
         if ($this->witness !== null) { $data['witness'] = $this->witness; }
         if ($this->id_confirmed_by !== null) { $data['id_confirmed_by'] = $this->id_confirmed_by; }
         if ($this->confirmed_at !== null) { $data['confirmed_at'] = $this->formatForDatabase($this->confirmed_at); }
+        if ($this->filled_text !== null) { $data['filled_text'] = $this->filled_text; }
 
         return $data;
     }

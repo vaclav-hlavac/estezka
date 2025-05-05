@@ -22,6 +22,8 @@ final class AuthApiTest extends TestCase
     private App $app;
     private PDO $pdo;
 
+
+
     /**
      * Prepares the Slim app, cleans the database and seeds a user before each test.
      */
@@ -64,19 +66,7 @@ final class AuthApiTest extends TestCase
      */
     public function testLoginSuccess(): void
     {
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/auth/login');
-        $body = (new StreamFactory())->createStream(json_encode([
-            'email' => 'api@example.com',
-            'password' => 'secret123'
-        ]));
-
-        $request = $request->withBody($body)->withHeader('Content-Type', 'application/json');
-
-        $response = $this->app->handle($request);
-
-        $this->assertSame(200, $response->getStatusCode());
-
-        $data = json_decode((string) $response->getBody(), true);
+        $data = $this->getLoginData();
         $this->assertArrayHasKey('access_token', $data);
         $this->assertArrayHasKey('refresh_token', $data);
     }
@@ -118,17 +108,7 @@ final class AuthApiTest extends TestCase
     public function testRefreshTokenReturnsNewAccessToken(): void
     {
         // Step 1: Login to get refresh token
-        $loginReq = (new ServerRequestFactory())->createServerRequest('POST', '/auth/login');
-        $loginBody = (new StreamFactory())->createStream(json_encode([
-            'email' => 'api@example.com',
-            'password' => 'secret123'
-        ]));
-        $loginReq = $loginReq->withBody($loginBody)->withHeader('Content-Type', 'application/json');
-
-        $loginResponse = $this->app->handle($loginReq);
-        $this->assertSame(200, $loginResponse->getStatusCode());
-
-        $loginData = json_decode((string) $loginResponse->getBody(), true);
+        $loginData = $this->getLoginData();
         $refreshToken = $loginData['refresh_token'];
 
         // Step 2: Refresh access token
@@ -144,5 +124,24 @@ final class AuthApiTest extends TestCase
         $refreshData = json_decode((string) $refreshResponse->getBody(), true);
         $this->assertArrayHasKey('access_token', $refreshData);
         $this->assertArrayHasKey('user_with_roles', $refreshData);
+    }
+
+    /**
+     * Helper function, that returns login data of Seed user
+     */
+    private function getLoginData(): mixed
+    {
+        $loginReq = (new ServerRequestFactory())->createServerRequest('POST', '/auth/login');
+        $loginBody = (new StreamFactory())->createStream(json_encode([
+            'email' => 'api@example.com',
+            'password' => 'secret123'
+        ]));
+        $loginReq = $loginReq->withBody($loginBody)->withHeader('Content-Type', 'application/json');
+
+        $loginResponse = $this->app->handle($loginReq);
+        $this->assertSame(200, $loginResponse->getStatusCode());
+
+        $loginData = json_decode((string)$loginResponse->getBody(), true);
+        return $loginData;
     }
 }

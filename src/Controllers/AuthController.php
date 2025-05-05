@@ -19,14 +19,9 @@ use App\Repository\UserRepository;
 use App\Services\AuthService;
 use App\Services\UserRolesService;
 use App\Utils\JsonResponseHelper;
-use DateTime;
 use Exception;
-use Firebase\JWT\JWT;
-use InvalidArgumentException;
 use PDO;
-use Random\RandomException;
-use Slim\Logger;
-use Symfony\Component\Console\Exception\MissingInputException;
+
 
 /**
  * @OA\Tag(name="Auth", description="Autorizace uživatelů")
@@ -257,7 +252,8 @@ class AuthController {
         $gangMemberRepository = new GangMemberRepository($this->pdo);
         $gangMember = new GangMember([
             "id_user" => $savedUser->getId(),
-            "id_patrol" => $gang->getId()
+            "id_patrol" => $gang->getId(),
+            "active_path_level" => 1,
         ]);
 
         $gangMemberRepository->insert($gangMember->toDatabase());

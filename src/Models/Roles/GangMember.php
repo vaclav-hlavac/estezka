@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 class GangMember extends BaseModel
 {
-    public int $id_patrol;
+    public ?int $id_patrol;
     public int $id_user;
 
     public ?string $nickname;
@@ -22,13 +22,13 @@ class GangMember extends BaseModel
     public ?int $active_path_level;
 
     public function __construct(array $data) {
-        $notNullArguments = ['id_user', 'id_patrol'];
+        $notNullArguments = ['id_user'];
         $this->requiredArgumentsControl($data, $notNullArguments);
 
         $this->id_user = $data['id_user'];
-        $this->id_patrol = $data['id_patrol'];
 
         // Optional fields
+        $this->id_patrol = $data['id_patrol'] ?? null;
         $this->nickname = $data['nickname'] ?? null;
         $this->avatar_url = $data['avatar_url'] ?? null;
         $this->gang_name = $data['patrol_name'] ?? null;
@@ -68,10 +68,14 @@ class GangMember extends BaseModel
      */
     public function toDatabase(): array
     {
-        return [
+        $data =  [
             'id_user' => $this->id_user,
-            'id_patrol' => $this->id_patrol,
         ];
+        if ($this->active_path_level != null) { $data['active_path_level'] = $this->active_path_level;}
+        if ($this->id_patrol != null) { $data['id_patrol'] = $this->id_patrol;}
+
+
+        return $data;
     }
 
     public function getId()

@@ -48,7 +48,7 @@ class TaskProgressController extends CRUDController
         $troopRepository = new TroopRepository($this->pdo);
 
         if (!$troopRepository->isUserGangMemberInTroop($userId, $troopId)) {
-            return JsonResponseHelper::jsonResponse("Uživatel není člen družiny v tomto oddíle.", 403, $response);
+            throw new Exception("Uživatel není člen družiny v tomto oddíle.", 403);
         }
 
         $progressArray = $this->repository->findAllByIdUser($userId);
@@ -175,6 +175,7 @@ class TaskProgressController extends CRUDController
         $gangLeaderRepo = new GangLeaderRepository($this->pdo);
         $troopLeaderRepo = new TroopLeaderRepository($this->pdo);
         $notificationRepo = new NotificationRepository($this->pdo);
+        error_log("test");
 
         // Find user's gang (because we need gang leaders too)
         $gangMember = $gangRepo->findById($taskProgress->id_user);
@@ -182,7 +183,10 @@ class TaskProgressController extends CRUDController
             return; // user is not in a gang
         }
 
-        $gangId = $gangMember->id_gang;
+        $gangId = $gangMember->id_patrol;
+
+        error_log("gang".$gangId);
+        error_log("troop".$troopId);
 
         // Get all gang leaders
         $gangLeaders = $gangLeaderRepo->findAllByGangId($gangId);

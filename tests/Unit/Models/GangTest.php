@@ -50,7 +50,7 @@ final class GangTest extends TestCase
         new Gang([]);
     }
 
-    public function testJsonSerializeContainsExpectedFields(): void
+    public function testJsonSerializeExpectedFields(): void
     {
         $gang = new Gang($this->baseData);
         $json = $gang->jsonSerialize();
@@ -62,7 +62,7 @@ final class GangTest extends TestCase
         $this->assertArrayHasKey('invite_code', $json);
     }
 
-    public function testToDatabaseContainsExpectedStructure(): void
+    public function testToDatabaseExpectedStructure(): void
     {
         $gang = new Gang($this->baseData);
         $db = $gang->toDatabase();

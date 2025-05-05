@@ -11,7 +11,7 @@ class PatrolMemberController extends CRUDController
         parent::__construct($pdo, GangMember::class, new GangMemberRepository($pdo) );
     }
 
-    public function changePatrol($request, $response, $args){
+    public function updatePatrolMember($request, $response, $args){
 
         $args['id'] = $args['id_user'];
         return parent::update($request, $response, $args);

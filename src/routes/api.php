@@ -7,8 +7,10 @@ use App\Controllers\AuthController;
 use App\Controllers\GangController;
 use App\Controllers\GangLeaderController;
 use App\Controllers\NotificationController;
+use App\Controllers\PatrolLeaderController;
 use App\Controllers\PatrolMemberController;
 use App\Controllers\TaskProgressController;
+use App\Controllers\TroopLeaderController;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GangAuthorizationMiddleware;
@@ -89,7 +91,24 @@ return function (App $app) {
 
         $troops->get('/{id}/patrols', [$troopController, 'getTroopGangs']);
         $troops->post('/{id}/patrols', [$troopController, 'createGang']);
+
     })->add(new AuthMiddleware()); //adds authorization middleware
+
+    //************************* PATROL-LEADER ****************************************
+    $patrolLeaderController = new PatrolLeaderController($pdo);
+
+    $app->group('/troops/{id_troop}/patrols/{id_patrol}', function ($patrolLeader) use ($patrolLeaderController) {
+        $patrolLeader->post('/members/{id_user}/patrol-leaders', [$patrolLeaderController, 'create']);
+        $patrolLeader->delete('/patrol-leaders/{id_patrol_leader}', [$patrolLeaderController, 'delete']);
+    })->add(new AuthMiddleware()); //adds authorization middleware
+
+    //************************* TROOP-LEADER ****************************************
+    $troopLeaderController = new TroopLeaderController($pdo);
+
+    $app->group('/troops/{id_troop}', function ($troopLeader) use ($troopLeaderController) {
+        $troopLeader->post('/members/{id_user}/troop-leaders', [$troopLeaderController, 'create']);
+    })->add(new AuthMiddleware()); //adds authorization middleware
+
 
 
     //************************* TASK-PROGRESSES ****************************************
@@ -153,7 +172,7 @@ return function (App $app) {
     $gangLeaderController = new PatrolMemberController($pdo);
 
     $app->group('/patrols', function ($gangs) use ($gangLeaderController) {
-        $gangs->patch('/{id_patrol}/members/{id_user}', [$gangLeaderController, 'changePatrol']);
+        $gangs->patch('/{id_patrol}/members/{id_user}', [$gangLeaderController, 'updatePatrolMember']);
     })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
 
     //************************* PATROL LEADERS ****************************************

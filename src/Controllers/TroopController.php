@@ -9,9 +9,7 @@ use App\Repository\GangRepository;
 use App\Repository\TroopRepository;
 use App\Utils\JsonResponseHelper;
 use Exception;
-use OpenApi\Annotations as OA;
 use App\Models\Troop;
-use PhpParser\Node\Expr\Array_;
 
 
 /**
@@ -109,18 +107,16 @@ class TroopController extends CRUDController
      */
     public function getTroopGangs($request, $response, $args) {
         $troopRepository = new TroopRepository($this->pdo);
-        try {
-            $troop = $troopRepository->findById($args['id']);
-            if (!$troop) {
-                $response->getBody()->write(json_encode(['message' => 'Troop not found']));
-                return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
-            }
 
-            $gangRepository = new GangRepository($this->pdo);
-            $gangs = $gangRepository->findAllByTroopId($args['id']);
-        }catch (DatabaseException $e) {
-            return JsonResponseHelper::jsonResponse($e->getMessage(), $e->getCode(), $response);
+        $troop = $troopRepository->findById($args['id']);
+        if (!$troop) {
+            $response->getBody()->write(json_encode(['message' => 'Troop not found']));
+            return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
         }
+
+        $gangRepository = new GangRepository($this->pdo);
+        $gangs = $gangRepository->findAllByTroopId($args['id']);
+
 
         $response->getBody()->write(json_encode($gangs));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');

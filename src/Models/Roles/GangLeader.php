@@ -10,7 +10,7 @@ class GangLeader extends BaseModel
 {
     protected ?int $id_gang_leader;
     public int $id_user;
-    public int $id_gang;
+    public int $id_patrol;
 
     public ?string $gang_name;
     public ?string $gang_color;
@@ -23,7 +23,7 @@ class GangLeader extends BaseModel
 
         $this->id_gang_leader = $data['id_patrol_leader'] ?? null;
         $this->id_user = $data['id_user'];
-        $this->id_gang = $data['id_patrol'];
+        $this->id_patrol = $data['id_patrol'];
 
         // Optional fields
         $this->gang_name = $data['patrol_name'] ?? null;
@@ -40,7 +40,7 @@ class GangLeader extends BaseModel
         return [
             'id_patrol_leader' => $this->id_gang_leader,
             'id_user' => $this->id_user,
-            'id_patrol' => $this->id_gang,
+            'id_patrol' => $this->id_patrol,
             'patrol_name' => $this->gang_name,
             'patrol_color' => $this->gang_color,
             'id_troop' => $this->id_troop,
@@ -57,7 +57,7 @@ class GangLeader extends BaseModel
     {
         return [
             'id_user' => $this->id_user,
-            'id_patrol' => $this->id_gang,
+            'id_patrol' => $this->id_patrol,
         ];
     }
 

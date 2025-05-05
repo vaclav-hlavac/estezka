@@ -77,15 +77,4 @@ class GangController extends CRUDController
 
         return JsonResponseHelper::jsonResponse($gang, 200, $response);
     }
-
-    public function addPatrolToTroop($request, $response, $args) //todo test + documentation
-    {
-        $rawBody = $request->getBody()->getContents();
-        $data = json_decode($rawBody, true);
-
-        $data['id_troop'] = $args['id_troop'];
-        $request = $request->withParsedBody($data);
-
-        return parent::create($request, $response, $args);
-    }
 }

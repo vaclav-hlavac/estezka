@@ -6,13 +6,12 @@ use App\Models\User;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Symfony\Component\Console\Exception\MissingInputException;
 
 class AuthService {
     private string $jwtSecret;
 
     public function __construct() {
-        $this->jwtSecret = $_ENV['JWT_SECRET'] ?? throw new MissingInputException('Server error: Missing JWT secret', 500);
+        $this->jwtSecret = $_ENV['JWT_SECRET'] ?? throw new Exception('Server error: Missing JWT secret', 500);
     }
 
     public function generateJWT(User $user): string {

@@ -25,7 +25,7 @@ final class GangLeaderTest extends TestCase
 
         $this->assertSame(5, $leader->getId());
         $this->assertSame(10, $leader->id_user);
-        $this->assertSame(20, $leader->id_gang);
+        $this->assertSame(20, $leader->id_patrol);
         $this->assertSame('Vlci', $leader->gang_name);
         $this->assertSame('green', $leader->gang_color);
         $this->assertSame(3, $leader->id_troop);
@@ -42,7 +42,7 @@ final class GangLeaderTest extends TestCase
         $leader = new GangLeader($data);
 
         $this->assertSame(1, $leader->id_user);
-        $this->assertSame(2, $leader->id_gang);
+        $this->assertSame(2, $leader->id_patrol);
         $this->assertNull($leader->getId());
         $this->assertNull($leader->gang_name);
         $this->assertNull($leader->gang_color);

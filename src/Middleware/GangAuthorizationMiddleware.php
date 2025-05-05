@@ -31,7 +31,7 @@ class GangAuthorizationMiddleware
         $userId = $authUser->id_user;
 
         // Get id_gang from request
-        $gangId = $request->getAttribute('id_gang');
+        $gangId = $request->getAttribute('id_patrol');
         if (!$gangId) {
             return JsonResponseHelper::jsonResponse('Bad request: Missing id_gang', 400, new SlimResponse());
         }
