@@ -10,6 +10,21 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
  * GangLeader model representing a user's role as a leader of a patrol (gang).
  *
  * Includes patrol and troop metadata for use in enriched API responses.
+ *
+ * /**
+ * @OA\Schema(
+ *      schema="GangLeader",
+ *      title="GangLeader",
+ *      description="Represents a patrol leader (gang leader) within a patrol",
+ *      @OA\Property(property="id_patrol_leader", type="integer", example=12),
+ *      @OA\Property(property="id_user", type="integer", example=123),
+ *      @OA\Property(property="id_patrol", type="integer", example=5),
+ *      @OA\Property(property="patrol_name", type="string", example="Foxes"),
+ *      @OA\Property(property="patrol_color", type="string", example="#ff6600"),
+ *      @OA\Property(property="id_troop", type="integer", example=2),
+ *      @OA\Property(property="troop_name", type="string", example="Northwind Troop")
+ *  )
+ * /
  */
 class GangLeader extends BaseModel
 {

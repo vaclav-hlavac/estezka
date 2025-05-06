@@ -29,16 +29,35 @@ class TaskProgressController extends CRUDController
     }
 
     /**
-     * Returns all task progress entries for a specific user,
-     * including the corresponding task data for each progress.
-     * The user must be a patrol member in the specified troop; otherwise, a 403 error is returned.
+     * Returns all task progress entries for a specific user in a given troop, including task details.
      *
-     * @param Request $request   The HTTP request object.
-     * @param Response $response The HTTP response object.
-     * @param array $args        Route parameters containing 'id_user' and 'id_troop'.
+     * @param Request $request   The HTTP request.
+     * @param Response $response The HTTP response.
+     * @param array $args        Route parameters: id_user, id_troop.
+     * @return ResponseInterface
      *
-     * @return ResponseInterface JSON response containing an array of task progress records
-     *                           with associated task details, or an error message.
+     * @OA\Get(
+     *     path="/troops/{id_troop}/members/{id_user}/task-progresses",
+     *     summary="Get all task progresses for a user in a troop",
+     *     tags={"Task Progress"},
+     *     @OA\Parameter(
+     *         name="id_troop",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the troop",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="id_user",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="List of task progresses with task details"),
+     *     @OA\Response(response=403, description="User is not a patrol member in the troop"),
+     *     @OA\Response(response=500, description="Internal error")
+     * )
      */
     public function getUserTaskProgresses($request, $response, $args)
     {
@@ -70,15 +89,37 @@ class TaskProgressController extends CRUDController
     }
 
     /**
-     * Updates an existing TaskProgress record for a given user and troop.
-     * Validates that the task progress belongs to the user and that the task is part of the specified troop.
+     * Updates a specific task progress entry for a user in a troop.
      *
-     * Endpoint: PATCH /troops/{id_troop}/members/{id_user}/task-progresses/{id_task_progress}
+     * @param Request $request   The HTTP request.
+     * @param Response $response The HTTP response.
+     * @param array $args        Route parameters: id_troop, id_user, id_task_progress.
+     * @return ResponseInterface
      *
-     * @param $request  Request Request
-     * @param $response Response Response
-     * @param $args     array arguments (id_troop, id_user, id_task_progress)
-     * @return ResponseInterface JSON response with updated object or error
+     * @OA\Patch(
+     *     path="/troops/{id_troop}/members/{id_user}/task-progresses/{id_task_progress}",
+     *     summary="Update a task progress for a user in a troop",
+     *     tags={"Task Progress"},
+     *     @OA\Parameter(name="id_troop", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="id_user", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="id_task_progress", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="planned_to", type="string", format="date-time"),
+     *             @OA\Property(property="signed_at", type="string", format="date-time"),
+     *             @OA\Property(property="confirmed_at", type="string", format="date-time"),
+     *             @OA\Property(property="witness", type="string"),
+     *             @OA\Property(property="filled_text", type="string"),
+     *             @OA\Property(property="id_confirmed_by", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Updated task progress"),
+     *     @OA\Response(response=400, description="Invalid input"),
+     *     @OA\Response(response=403, description="Unauthorized access"),
+     *     @OA\Response(response=404, description="Task progress not found")
+     * )
      */
     public function updateUserTaskProgress($request, $response, $args)
     {
@@ -131,13 +172,26 @@ class TaskProgressController extends CRUDController
     }
 
     /**
-     * Returns a specific TaskProgressWithTask by its ID.
+     * Returns a single task progress entry with task data.
      *
-     * @param Request $request   The HTTP request object.
-     * @param Response $response The HTTP response object.
-     * @param array $args        Route parameters containing 'id_task_progress'.
+     * @param Request $request   The HTTP request.
+     * @param Response $response The HTTP response.
+     * @param array $args        Route parameters: id_task_progress.
+     * @return ResponseInterface
      *
-     * @return ResponseInterface JSON response containing a single task progress with task details, or an error message.
+     * @OA\Get(
+     *     path="/task-progresses/{id_task_progress}",
+     *     summary="Get a specific task progress by ID",
+     *     tags={"Task Progress"},
+     *     @OA\Parameter(
+     *         name="id_task_progress",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Task progress with task details"),
+     *     @OA\Response(response=404, description="Task progress or task not found")
+     * )
      */
     public function getUserTaskProgressById($request, $response, $args)
     {
@@ -221,22 +275,26 @@ class TaskProgressController extends CRUDController
     }
 
     /**
-     * Retrieves all TaskProgress entries for all members of a specific troop.
+     * Returns all task progresses for all members of a troop.
      *
-     * For each gang member (patrol member) in the troop, this method finds their task progresses
-     * and attaches the corresponding task information. The combined results are returned
-     * as an array of TaskProgressWithTask objects.
+     * @param Request $request   The HTTP request.
+     * @param Response $response The HTTP response.
+     * @param array $args        Route parameters: id_troop.
+     * @return ResponseInterface
      *
-     * Endpoint: GET /troops/{id_troop}/task-progresses
-     *
-     * @param Request  $request   The HTTP request object.
-     * @param Response $response  The HTTP response object.
-     * @param array    $args      Route parameters containing 'id_troop'.
-     *
-     * @return ResponseInterface  JSON response containing a list of TaskProgressWithTask objects,
-     *                             or an error message if the troop is not found.
-     *
-     * @throws NotFoundException if the specified troop does not exist.
+     * @OA\Get(
+     *     path="/troops/{id_troop}/task-progresses",
+     *     summary="Get all task progresses for a troop",
+     *     tags={"Task Progress"},
+     *     @OA\Parameter(
+     *         name="id_troop",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="List of all task progresses with tasks for the troop"),
+     *     @OA\Response(response=404, description="Troop not found")
+     * )
      */
     public function getTaskProgressesByTroop($request, $response, $args)
     {

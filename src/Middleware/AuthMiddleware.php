@@ -11,7 +11,24 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as SlimResponse;
 
+/**
+ * Authentication middleware that verifies a JWT token from the Authorization header.
+ *
+ * If the token is valid, it attaches user data to the request under the attribute `auth_user`.
+ * Returns a 401 JSON error response if the token is missing, invalid, or expired.
+ */
 class AuthMiddleware {
+
+    /**
+     * Invokes the middleware.
+     *
+     * Validates the JWT from the Authorization header. On success, enriches the request with
+     * user data; on failure, returns a 401 Unauthorized JSON response.
+     *
+     * @param Request $request The incoming HTTP request.
+     * @param RequestHandler $handler The next middleware or route handler.
+     * @return Response The response, either an error or the result of the next handler.
+     */
     public function __invoke(Request $request, RequestHandler $handler): Response {
         // Read Authorization header
         $authHeader = $request->getHeaderLine('Authorization');

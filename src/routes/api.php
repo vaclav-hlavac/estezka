@@ -54,8 +54,10 @@ return function (App $app) {
 
     $app->group('/tasks', function ($tasks) use ($taskController) {
         $tasks->get('', [$taskController, 'getAllGeneralTasks']);
-
         $tasks->get('/{id}', [$taskController, 'getById']);
+
+        $tasks->get('/level/{pathLevel}', [$taskController, 'getAllGeneralTasksByLevel']);
+
     });
 
 
@@ -102,6 +104,7 @@ return function (App $app) {
 
     $app->group('/troops/{id_troop}', function ($troopLeader) use ($troopLeaderController) {
         $troopLeader->post('/members/{id_user}/troop-leaders', [$troopLeaderController, 'create']);
+        $troopLeader->delete('/members/{id_user}/troop-leaders/{id_troop_leader}', [$troopLeaderController, 'delete']);
     })->add(new AuthMiddleware()); //adds authorization middleware
 
 

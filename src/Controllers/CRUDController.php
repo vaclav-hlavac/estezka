@@ -14,6 +14,11 @@ use Psr\Log\LoggerInterface;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 /**
+ * Abstract base controller providing generic CRUD operations.
+ *
+ * This controller is meant to be extended by specific resource controllers,
+ * and it operates on a given model and repository pair.
+ *
  * @template TModel of BaseModel
  * @template TRepository of GenericRepository
  */
@@ -39,6 +44,14 @@ abstract class CRUDController
         $this->repository = $repository;
     }
 
+    /**
+     * Returns all records of the given model.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request.
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response.
+     * @param array $args Route arguments (unused).
+     * @return \Psr\Http\Message\ResponseInterface JSON response with array of records.
+     */
     public function getAll($request, $response, $args) {
         try {
             $foundObjects = $this->repository->findAll();
@@ -48,6 +61,14 @@ abstract class CRUDController
         }
     }
 
+    /**
+     * Retrieves a single record by its ID.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request.
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response.
+     * @param array $args Must include 'id' as route argument.
+     * @return \Psr\Http\Message\ResponseInterface JSON response with object or 404.
+     */
     public function getById($request, $response, $args) {
         $foundObject = $this->repository->findById($args['id']);
 
@@ -59,6 +80,14 @@ abstract class CRUDController
         }
     }
 
+    /**
+     * Creates a new record from request body.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request.
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response.
+     * @param array $args Route arguments (optional).
+     * @return \Psr\Http\Message\ResponseInterface JSON response with created object.
+     */
     public function create($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
@@ -72,6 +101,16 @@ abstract class CRUDController
         return JsonResponseHelper::jsonResponse($savedObject, 201, $response);
     }
 
+    /**
+     * Updates an existing record by ID with data from request body.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request.
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response.
+     * @param array $args Must include 'id' as route argument.
+     * @return \Psr\Http\Message\ResponseInterface JSON response with updated object.
+     * @throws NotFoundException If object with given ID does not exist.
+     * @throws DatabaseException If the update fails.
+     */
     public function update($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
@@ -94,6 +133,14 @@ abstract class CRUDController
         }
     }
 
+    /**
+     * Deletes a record by its ID.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request.
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response.
+     * @param array $args Must include 'id' as route argument.
+     * @return \Psr\Http\Message\ResponseInterface 204 No Content on success, or 404.
+     */
     public function delete($request, $response, $args) {
         // exist check
 

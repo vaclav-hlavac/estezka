@@ -5,6 +5,7 @@ namespace App\Models;
 use Random\RandomException;
 
 /**
+ *
  * Gang model representing a patrol within a troop.
  *
  * Contains identifying information including name, troop ID, color, and invite code.

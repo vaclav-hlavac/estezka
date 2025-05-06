@@ -16,14 +16,822 @@
     ],
     "paths": {
         "/auth": {},
+        "/notifications": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Create a new notification",
+                "description": "Creates a new notification.",
+                "operationId": "6c58a9d6ff24e266a1fed03f114f66fb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_user_creator",
+                                    "id_user_receiver",
+                                    "text"
+                                ],
+                                "properties": {
+                                    "id_user_creator": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "id_user_receiver": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "text": {
+                                        "type": "string",
+                                        "example": "Task completed"
+                                    },
+                                    "id_task_progress": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "task_status_change"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notification created"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/troops/{id_troop}/patrols/{id_patrol}": {},
+        "/patrols": {},
         "/troops": {},
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "description": "Registers a new user. Optionally creates a new troop or joins an existing patrol via invite code.",
+                "operationId": "10c02a951e844462c465d0e576b8c942",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nickname",
+                                    "name",
+                                    "surname",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "nickname": {
+                                        "type": "string",
+                                        "example": "scoutjoe"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Joe"
+                                    },
+                                    "surname": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "joe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "hunter2"
+                                    },
+                                    "new_troop": {
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Falcons"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "invite_code": {
+                                        "type": "string",
+                                        "example": "a1b2c3d4"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User successfully registered"
+                    },
+                    "400": {
+                        "description": "Missing required troop info"
+                    },
+                    "409": {
+                        "description": "Email already exists"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Log in a user",
+                "description": "Logs a user in by verifying email and password.\nReturns access token, refresh token and user with roles.",
+                "operationId": "363e422b5a8c763fa1ea6fd03a77481d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "joe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "hunter2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged in"
+                    },
+                    "400": {
+                        "description": "Missing credentials"
+                    },
+                    "401": {
+                        "description": "Invalid login"
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh access token using refresh token",
+                "description": "Issues a new access token based on a valid refresh token.",
+                "operationId": "d6e134316a3213ab2da85eb1e545a77f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "refresh_token"
+                                ],
+                                "properties": {
+                                    "refresh_token": {
+                                        "type": "string",
+                                        "example": "123456789abcdef"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Access token refreshed"
+                    },
+                    "400": {
+                        "description": "Missing refresh token"
+                    },
+                    "401": {
+                        "description": "Invalid or expired refresh token"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/troops/{id_troop}/patrols/{id_patrol}/members": {
+            "get": {
+                "tags": [
+                    "Troops",
+                    "Patrols"
+                ],
+                "summary": "Get all patrol members within a troop",
+                "description": "Retrieves all members of a specific patrol belonging to a troop.",
+                "operationId": "0b1bc57eda4a1f33443159d129c25824",
+                "parameters": [
+                    {
+                        "name": "id_troop",
+                        "in": "path",
+                        "description": "ID of the troop",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_patrol",
+                        "in": "path",
+                        "description": "ID of the patrol",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of patrol members"
+                    },
+                    "403": {
+                        "description": "Patrol does not belong to troop"
+                    },
+                    "404": {
+                        "description": "Patrol not found"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/patrol/check-invite": {
+            "post": {
+                "tags": [
+                    "Patrols"
+                ],
+                "summary": "Check if invite code is valid",
+                "description": "Validates whether the given invite code corresponds to an existing patrol.",
+                "operationId": "142aac17a2e9387218d4d643826eb806",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "invite_code"
+                                ],
+                                "properties": {
+                                    "invite_code": {
+                                        "type": "string",
+                                        "example": "abc123xyz"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Valid invite code, patrol found"
+                    },
+                    "400": {
+                        "description": "Missing or invalid invite code"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/patrols/{id_patrol}/leaders": {
+            "post": {
+                "tags": [
+                    "Patrols"
+                ],
+                "summary": "Add a patrol leader to a patrol",
+                "description": "Creates a new patrol leader in the specified patrol.",
+                "operationId": "a04076fe89a611022c07f7256c607ece",
+                "parameters": [
+                    {
+                        "name": "id_patrol",
+                        "in": "path",
+                        "description": "ID of the patrol to assign leader to",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_user"
+                                ],
+                                "properties": {
+                                    "id_user": {
+                                        "type": "integer",
+                                        "example": 123
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Patrol leader assigned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GangLeader"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or patrol ID"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/users/{id_user}/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get all notifications for a user",
+                "description": "Retrieves all notifications received by the specified user.",
+                "operationId": "86a78643707bd214ca9568eb7f32908f",
+                "parameters": [
+                    {
+                        "name": "id_user",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of notifications"
+                    }
+                }
+            }
+        },
+        "/notifications/{id_notification}": {
+            "patch": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Update a notification",
+                "description": "Updates a notification (e.g. marking it as received).",
+                "operationId": "77186024dffcd21548f66c7b3b14cc2f",
+                "parameters": [
+                    {
+                        "name": "id_notification",
+                        "in": "path",
+                        "description": "ID of the notification",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "was_received": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notification updated"
+                    },
+                    "404": {
+                        "description": "Notification not found"
+                    }
+                }
+            }
+        },
+        "/troops/{id_troop}/patrols/{id_patrol}/members/{id_user}/patrol-leaders": {
+            "post": {
+                "tags": [
+                    "Patrol Leaders"
+                ],
+                "summary": "Assign patrol leader role to a user",
+                "description": "Assigns a user as patrol leader of the specified patrol.",
+                "operationId": "ce57ad351a5758e006c405ec94e33242",
+                "parameters": [
+                    {
+                        "name": "id_troop",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_patrol",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Patrol leader created"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/troops/{id_troop}/patrols/{id_patrol}/patrol-leaders/{id_patrol_leader}": {
+            "delete": {
+                "tags": [
+                    "Patrol Leaders"
+                ],
+                "summary": "Remove patrol leader role",
+                "description": "Deletes a patrol leader role.",
+                "operationId": "165ecbc0ea83ead408939638b2c319d1",
+                "parameters": [
+                    {
+                        "name": "id_troop",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_patrol",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_patrol_leader",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patrol leader deleted"
+                    },
+                    "404": {
+                        "description": "Patrol leader not found"
+                    }
+                }
+            }
+        },
+        "/patrols/{id_patrol}/members/{id_user}": {
+            "patch": {
+                "tags": [
+                    "Patrol Members"
+                ],
+                "summary": "Update patrol member data",
+                "description": "Updates patrol member information (e.g., active path level).",
+                "operationId": "758213a440b362b2acc72001b73201f0",
+                "parameters": [
+                    {
+                        "name": "id_patrol",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "active_path_level": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Patrol member updated"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "404": {
+                        "description": "Patrol member not found"
+                    }
+                }
+            }
+        },
+        "/tasks": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get all general tasks",
+                "description": "Retrieves all general tasks (not assigned to any troop).",
+                "operationId": "22e3fbb26cb6e03970bca830ee7c3b80",
+                "responses": {
+                    "200": {
+                        "description": "List of general tasks"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/tasks/level/{pathLevel}": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Get general tasks by path level",
+                "description": "Retrieves all general tasks filtered by path level.",
+                "operationId": "39cda8c2491da9dd644c08df66c5023d",
+                "parameters": [
+                    {
+                        "name": "pathLevel",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Filtered list of general tasks"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/troops/{id_troop}/members/{id_user}/task-progresses": {
+            "get": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Get all task progresses for a user in a troop",
+                "description": "Returns all task progress entries for a specific user in a given troop, including task details.",
+                "operationId": "e280fa104b0093b89efb3b5a0f9aff13",
+                "parameters": [
+                    {
+                        "name": "id_troop",
+                        "in": "path",
+                        "description": "ID of the troop",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_user",
+                        "in": "path",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of task progresses with task details"
+                    },
+                    "403": {
+                        "description": "User is not a patrol member in the troop"
+                    },
+                    "500": {
+                        "description": "Internal error"
+                    }
+                }
+            }
+        },
+        "/troops/{id_troop}/members/{id_user}/task-progresses/{id_task_progress}": {
+            "patch": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Update a task progress for a user in a troop",
+                "description": "Updates a specific task progress entry for a user in a troop.",
+                "operationId": "d104cf99eb639eb4ff21229862162bbf",
+                "parameters": [
+                    {
+                        "name": "id_troop",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_task_progress",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "planned_to": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "signed_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "confirmed_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "witness": {
+                                        "type": "string"
+                                    },
+                                    "filled_text": {
+                                        "type": "string"
+                                    },
+                                    "id_confirmed_by": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated task progress"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "403": {
+                        "description": "Unauthorized access"
+                    },
+                    "404": {
+                        "description": "Task progress not found"
+                    }
+                }
+            }
+        },
+        "/task-progresses/{id_task_progress}": {
+            "get": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Get a specific task progress by ID",
+                "description": "Returns a single task progress entry with task data.",
+                "operationId": "5239fb76dd66783f23e3604353199c58",
+                "parameters": [
+                    {
+                        "name": "id_task_progress",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task progress with task details"
+                    },
+                    "404": {
+                        "description": "Task progress or task not found"
+                    }
+                }
+            }
+        },
+        "/troops/{id_troop}/task-progresses": {
+            "get": {
+                "tags": [
+                    "Task Progress"
+                ],
+                "summary": "Get all task progresses for a troop",
+                "description": "Returns all task progresses for all members of a troop.",
+                "operationId": "a4897e62b1a25e811ef7e1a819a851ec",
+                "parameters": [
+                    {
+                        "name": "id_troop",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of all task progresses with tasks for the troop"
+                    },
+                    "404": {
+                        "description": "Troop not found"
+                    }
+                }
+            }
+        },
         "/troops/{id}/patrol": {
             "get": {
                 "tags": [
                     "Troops",
                     "Patrols"
                 ],
-                "summary": "Získat všechny družiny oddílu",
+                "summary": "Get all patrols of a troop",
+                "description": "Returns all patrols belonging to a given troop.",
                 "operationId": "9260105616f6cabd503b4064bb968480",
                 "parameters": [
                     {
@@ -37,7 +845,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Seznam oddílů"
+                        "description": "List of patrols"
+                    },
+                    "404": {
+                        "description": "Troop not found"
                     }
                 }
             },
@@ -46,8 +857,66 @@
                     "Troops",
                     "Patrols"
                 ],
-                "summary": "Vytvořit novou družinu v oddíle",
+                "summary": "Create a new patrol in a troop",
+                "description": "Creates a new patrol (gang) within the specified troop.",
                 "operationId": "5be23e51f178fb3884a7525677ac8986",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the troop to add the patrol to",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Data of the new patrol",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Wolves"
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "example": "#1a73e8"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Patrol successfully created"
+                    },
+                    "400": {
+                        "description": "Missing name"
+                    },
+                    "404": {
+                        "description": "Troop not found"
+                    }
+                }
+            }
+        },
+        "/troops/{id}/members": {
+            "get": {
+                "tags": [
+                    "Troops",
+                    "Patrols"
+                ],
+                "summary": "Get all patrol members in a troop",
+                "description": "Returns all patrol members (gang members) within a given troop.",
+                "operationId": "acdd0b0ed57cb674101ca7666bc64f1f",
                 "parameters": [
                     {
                         "name": "id",
@@ -59,17 +928,236 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Nová družina vytvořena"
+                    "200": {
+                        "description": "List of patrol members"
                     },
-                    "400": {
-                        "description": "Chybějící název"
+                    "500": {
+                        "description": "Error fetching data"
                     }
                 }
+            }
+        },
+        "/troops/{id_troop}/members/{id_user}/troop-leaders": {
+            "post": {
+                "tags": [
+                    "Troops"
+                ],
+                "summary": "Assign a user as a troop leader",
+                "description": "Assigns a user as a troop leader to a specific troop.",
+                "operationId": "7eff843e9466c8d0a0386537bd828a67",
+                "parameters": [
+                    {
+                        "name": "id_troop",
+                        "in": "path",
+                        "description": "ID of the troop",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_user",
+                        "in": "path",
+                        "description": "ID of the user to assign",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Troop leader assigned successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Troops"
+                ],
+                "summary": "Remove a troop leader",
+                "description": "Removes a troop leader by their ID.",
+                "operationId": "5b877ab31eda484489bf3e5b961134c3",
+                "parameters": [
+                    {
+                        "name": "id_patrol_leader",
+                        "in": "path",
+                        "description": "ID of the troop leader to remove",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Troop leader removed"
+                    },
+                    "404": {
+                        "description": "Leader not found"
+                    },
+                    "500": {
+                        "description": "Database error"
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update own user profile",
+                "description": "Updates the authenticated user's profile.",
+                "operationId": "f4735fd02b6b629463ec715dd598fa21",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nickname": {
+                                        "type": "string",
+                                        "example": "scout123"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "surname": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "notifications_enabled": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated"
+                    },
+                    "400": {
+                        "description": "Invalid input or JSON"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user by ID with roles",
+                "description": "Retrieves a user by ID including all roles.",
+                "operationId": "b40c482f7f161b0b8a6adb6b67dbb842",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User with roles returned"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "GangLeader": {
+                "title": "GangLeader",
+                "description": "Represents a patrol leader (gang leader) within a patrol",
+                "properties": {
+                    "id_patrol_leader": {
+                        "description": "GangLeader model representing a user's role as a leader of a patrol (gang).\n\nIncludes patrol and troop metadata for use in enriched API responses.\n\n/**",
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "id_user": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "id_patrol": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "patrol_name": {
+                        "type": "string",
+                        "example": "Foxes"
+                    },
+                    "patrol_color": {
+                        "type": "string",
+                        "example": "#ff6600"
+                    },
+                    "id_troop": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "troop_name": {
+                        "type": "string",
+                        "example": "Northwind Troop"
+                    }
+                },
+                "type": "object"
             }
         }
     },
     "tags": [
+        {
+            "name": "Auth",
+            "description": "Autorizace uživatelů"
+        },
+        {
+            "name": "Notifications",
+            "description": "Manage notifications"
+        },
+        {
+            "name": "Patrol Leaders",
+            "description": "Manage patrol leaders"
+        },
+        {
+            "name": "Patrol Members",
+            "description": "Manage patrol members"
+        },
         {
             "name": "Troops",
             "description": "Správa oddílů"
@@ -77,6 +1165,18 @@
         {
             "name": "Patrols",
             "description": "Patrols"
+        },
+        {
+            "name": "Tasks",
+            "description": "Tasks"
+        },
+        {
+            "name": "Task Progress",
+            "description": "Task Progress"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
         }
     ]
 }

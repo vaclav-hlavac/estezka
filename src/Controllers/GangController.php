@@ -16,16 +16,36 @@ class GangController extends CRUDController
     }
 
     /**
-     * Retrieves all patrol members from a specified patrol within a specified troop.
+     * Retrieves all members of a specific patrol belonging to a troop.
      *
-     * Endpoint: GET /troops/{id_troop}/patrols/{id_patrol}/members
+     * @param \Psr\Http\Message\ServerRequestInterface $request PSR-7 request
+     * @param \Psr\Http\Message\ResponseInterface $response PSR-7 response
+     * @param array $args Route arguments: id_troop and id_patrol
+     * @return ResponseInterface JSON with members or error message
      *
-     * Validates that the patrol belongs to the given troop before fetching the members.
-     *
-     * @param Request $request PSR-7 request object
-     * @param Response $response PSR-7 response object
-     * @param array $args Route parameters (id_troop, id_patrol)
-     * @return ResponseInterface JSON response containing the list of patrol members or an error
+     * @OA\Get(
+     *     path="/troops/{id_troop}/patrols/{id_patrol}/members",
+     *     summary="Get all patrol members within a troop",
+     *     tags={"Troops", "Patrols"},
+     *     @OA\Parameter(
+     *         name="id_troop",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the troop",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="id_patrol",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the patrol",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="List of patrol members"),
+     *     @OA\Response(response=403, description="Patrol does not belong to troop"),
+     *     @OA\Response(response=404, description="Patrol not found"),
+     *     @OA\Response(response=500, description="Database error")
+     * )
      */
     public function getGangMembers($request, $response, $args)
     {
@@ -55,6 +75,30 @@ class GangController extends CRUDController
         }
     }
 
+    /**
+     * Validates whether the given invite code corresponds to an existing patrol.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request PSR-7 request with JSON body
+     * @param \Psr\Http\Message\ResponseInterface $response PSR-7 response
+     * @param array $args Route arguments (not used)
+     * @return ResponseInterface JSON response with gang info or error
+     *
+     * @OA\Post(
+     *     path="/patrol/check-invite",
+     *     summary="Check if invite code is valid",
+     *     tags={"Patrols"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"invite_code"},
+     *             @OA\Property(property="invite_code", type="string", example="abc123xyz")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Valid invite code, patrol found"),
+     *     @OA\Response(response=400, description="Missing or invalid invite code"),
+     *     @OA\Response(response=500, description="Database error")
+     * )
+     */
     public function checkInviteCode($request, $response, $args)
     {
         $rawBody = $request->getBody()->getContents();

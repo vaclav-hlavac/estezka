@@ -24,18 +24,36 @@ class TroopController extends CRUDController
 
 
     /**
+     * Creates a new patrol (gang) within the specified troop.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request containing JSON body with patrol name
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response object
+     * @param array $args Route arguments, especially the troop ID
+     * @return \Psr\Http\Message\ResponseInterface
+     *
      * @OA\Post(
      *     path="/troops/{id}/patrol",
-     *     summary="Vytvořit novou družinu v oddíle",
+     *     summary="Create a new patrol in a troop",
      *     tags={"Troops", "Patrols"},
      *     @OA\Parameter(
-     *             name="id",
-     *             in="path",
-     *             required=true,
-     *             @OA\Schema(type="integer")
-     *       ),
-     *     @OA\Response(response="201", description="Nová družina vytvořena"),
-     *     @OA\Response(response="400", description="Chybějící název")
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the troop to add the patrol to",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Data of the new patrol",
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Wolves"),
+     *             @OA\Property(property="color", type="string", example="#1a73e8")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Patrol successfully created"),
+     *     @OA\Response(response=400, description="Missing name"),
+     *     @OA\Response(response=404, description="Troop not found")
      * )
      */
     public function createGang($request, $response, $args) {
@@ -92,17 +110,25 @@ class TroopController extends CRUDController
 
 
     /**
+     * Returns all patrols belonging to a given troop.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $args Route arguments (expects 'id' for troop ID)
+     * @return \Psr\Http\Message\ResponseInterface
+     *
      * @OA\Get(
      *     path="/troops/{id}/patrol",
-     *      summary="Získat všechny družiny oddílu",
-     *      tags={"Troops", "Patrols"},
-     *      @OA\Parameter(
-     *              name="id",
-     *              in="path",
-     *              required=true,
-     *              @OA\Schema(type="integer")
-     *        ),
-     *     @OA\Response(response="200", description="Seznam oddílů")
+     *     summary="Get all patrols of a troop",
+     *     tags={"Troops", "Patrols"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="List of patrols"),
+     *     @OA\Response(response=404, description="Troop not found")
      * )
      */
     public function getTroopGangs($request, $response, $args) {
@@ -123,6 +149,28 @@ class TroopController extends CRUDController
     }
 
 
+    /**
+     * Returns all patrol members (gang members) within a given troop.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $args Route arguments (expects 'id' for troop ID)
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @OA\Get(
+     *     path="/troops/{id}/members",
+     *     summary="Get all patrol members in a troop",
+     *     tags={"Troops", "Patrols"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="List of patrol members"),
+     *     @OA\Response(response=500, description="Error fetching data")
+     * )
+     */
     public function getTroopMembers($request, $response, $args)
     {
         $troopId = (int)($args['id'] ?? 0);

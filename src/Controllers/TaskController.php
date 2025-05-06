@@ -15,6 +15,22 @@ class TaskController extends CRUDController{
     }
 
 
+    /**
+     * Retrieves all general tasks (not assigned to any troop).
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $args
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @OA\Get(
+     *     path="/tasks",
+     *     summary="Get all general tasks",
+     *     tags={"Tasks"},
+     *     @OA\Response(response=200, description="List of general tasks"),
+     *     @OA\Response(response=500, description="Database error")
+     * )
+     */
     public function getAllGeneralTasks($request, $response, $args) {
         $taskRepository = new TaskRepository($this->pdo);
         try {
@@ -25,6 +41,28 @@ class TaskController extends CRUDController{
         }
     }
 
+    /**
+     * Retrieves all general tasks filtered by path level.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $args Contains 'pathLevel'
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @OA\Get(
+     *     path="/tasks/level/{pathLevel}",
+     *     summary="Get general tasks by path level",
+     *     tags={"Tasks"},
+     *     @OA\Parameter(
+     *         name="pathLevel",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Filtered list of general tasks"),
+     *     @OA\Response(response=500, description="Database error")
+     * )
+     */
     public function getAllGeneralTasksByLevel($request, $response, $args) {
         $taskRepository = new TaskRepository($this->pdo);
         try {

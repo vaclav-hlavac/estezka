@@ -36,6 +36,38 @@ class AuthController {
         $this->authService = $authService;
     }
 
+    /**
+     * Registers a new user. Optionally creates a new troop or joins an existing patrol via invite code.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request The HTTP request containing registration data.
+     * @param \Psr\Http\Message\ResponseInterface $response The HTTP response to return.
+     * @param array $args Route arguments (not used here).
+     * @return \Psr\Http\Message\ResponseInterface JSON response with the created user.
+     *
+     * @OA\Post(
+     *     path="/auth/register",
+     *     summary="Register a new user",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nickname", "name", "surname", "email", "password"},
+     *             @OA\Property(property="nickname", type="string", example="scoutjoe"),
+     *             @OA\Property(property="name", type="string", example="Joe"),
+     *             @OA\Property(property="surname", type="string", example="Doe"),
+     *             @OA\Property(property="email", type="string", example="joe@example.com"),
+     *             @OA\Property(property="password", type="string", example="hunter2"),
+     *             @OA\Property(property="new_troop", type="object",
+     *                 @OA\Property(property="name", type="string", example="Falcons")
+     *             ),
+     *             @OA\Property(property="invite_code", type="string", example="a1b2c3d4")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="User successfully registered"),
+     *     @OA\Response(response=400, description="Missing required troop info"),
+     *     @OA\Response(response=409, description="Email already exists")
+     * )
+     */
     public function register($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
@@ -88,6 +120,32 @@ class AuthController {
     }
 
 
+    /**
+     * Logs a user in by verifying email and password.
+     * Returns access token, refresh token and user with roles.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request with login credentials
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response
+     * @param array $args Route arguments (not used)
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @OA\Post(
+     *     path="/auth/login",
+     *     summary="Log in a user",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string", example="joe@example.com"),
+     *             @OA\Property(property="password", type="string", example="hunter2")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Successfully logged in"),
+     *     @OA\Response(response=400, description="Missing credentials"),
+     *     @OA\Response(response=401, description="Invalid login")
+     * )
+     */
     public function login($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
@@ -142,6 +200,31 @@ class AuthController {
         ], 200, $response);
     }
 
+    /**
+     * Issues a new access token based on a valid refresh token.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request HTTP request with refresh token
+     * @param \Psr\Http\Message\ResponseInterface $response HTTP response
+     * @param array $args Route arguments (not used)
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @OA\Post(
+     *     path="/auth/refresh",
+     *     summary="Refresh access token using refresh token",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"refresh_token"},
+     *             @OA\Property(property="refresh_token", type="string", example="123456789abcdef")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Access token refreshed"),
+     *     @OA\Response(response=400, description="Missing refresh token"),
+     *     @OA\Response(response=401, description="Invalid or expired refresh token"),
+     *     @OA\Response(response=404, description="User not found")
+     * )
+     */
     public function refresh($request, $response, $args) {
         $rawBody = $request->getBody()->getContents();
         $data = json_decode($rawBody, true);
