@@ -7,6 +7,12 @@ use DateTimeInterface;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * TaskProgress model representing a user's progress on a specific task.
+ *
+ * Includes information such as planned completion date, confirmation metadata,
+ * and custom filled-in text. Supports JSON serialization and database formatting.
+ */
 class TaskProgress extends BaseModel
 {
     public int $id_user;

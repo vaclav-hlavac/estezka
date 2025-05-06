@@ -7,6 +7,12 @@ use App\Models\Roles\GangMember;
 use App\Models\Roles\GangLeader;
 use App\Models\Roles\TroopLeader;
 
+/**
+ * Wrapper object that combines a User entity with all of their assigned roles.
+ *
+ * Includes optional gang membership and lists of leadership roles.
+ * Designed for convenient JSON serialization of user + roles in one payload.
+ */
 class UserWithRoles implements \JsonSerializable
 {
     public User $user;

@@ -6,6 +6,11 @@ use App\Models\BaseModel;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+/**
+ * GangMember model representing a user assigned as a member of a patrol (gang).
+ *
+ * Includes optional metadata for UI (nickname, avatar), patrol/troop info, and task progress summary.
+ */
 class GangMember extends BaseModel
 {
     public ?int $id_patrol;

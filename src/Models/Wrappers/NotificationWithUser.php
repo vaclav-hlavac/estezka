@@ -6,6 +6,11 @@ use App\Models\Notification;
 use App\Models\User;
 use JsonSerializable;
 
+/**
+ * Wrapper combining a Notification with the creator's User data.
+ *
+ * Useful for displaying enriched notification lists where sender details are needed.
+ */
 class NotificationWithUser implements JsonSerializable
 {
     private Notification $notification;

@@ -5,6 +5,11 @@ namespace App\Models;
 use DateTime;
 use DateTimeInterface;
 
+/**
+ * Notification model representing a user-to-user message or system alert.
+ *
+ * Supports linking to a specific task progress and tracks delivery status and timestamps.
+ */
 class Notification extends BaseModel
 {
     public ?int $id_notification;

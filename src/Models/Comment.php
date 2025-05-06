@@ -6,6 +6,11 @@ use DateTime;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * Comment model representing user-to-user feedback or messages linked optionally to a task.
+ *
+ * Includes author, recipient, posting time, and optional link to a task progress record.
+ */
 class Comment extends BaseModel
 {
     public int $user_by;

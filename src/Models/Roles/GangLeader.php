@@ -6,6 +6,11 @@ use App\Models\BaseModel;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+/**
+ * GangLeader model representing a user's role as a leader of a patrol (gang).
+ *
+ * Includes patrol and troop metadata for use in enriched API responses.
+ */
 class GangLeader extends BaseModel
 {
     protected ?int $id_gang_leader;

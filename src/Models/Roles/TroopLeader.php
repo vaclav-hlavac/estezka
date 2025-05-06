@@ -6,6 +6,11 @@ use App\Models\BaseModel;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+/**
+ * TroopLeader model representing a user's role as a leader of a troop.
+ *
+ * Includes troop metadata for enriched API responses.
+ */
 class TroopLeader extends BaseModel
 {
     protected ?int $id_troop_leader;

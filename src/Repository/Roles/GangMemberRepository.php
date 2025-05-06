@@ -8,6 +8,13 @@ use App\Repository\GenericRepository;
 use PDO;
 use PDOException;
 
+/**
+ * Repository for accessing gang member (patrol member) data from the `patrol_member` table.
+ *
+ * Provides enriched data including user info, patrol metadata, troop membership, and task statistics.
+ *
+ * @extends GenericRepository<GangMember>
+ */
 class GangMemberRepository extends GenericRepository
 {
     public function __construct(PDO $pdo)
@@ -15,6 +22,15 @@ class GangMemberRepository extends GenericRepository
         parent::__construct($pdo, 'patrol_member', 'id_user', GangMember::class);
     }
 
+    /**
+     * Finds a single GangMember by their user ID.
+     *
+     * Returns enriched gang member data including patrol, troop, nickname, avatar, and task stats.
+     *
+     * @param int $id_user The ID of the user to find.
+     * @return GangMember|null The GangMember model or null if not found.
+     * @throws DatabaseException If a database error occurs.
+     */
     public function findById(int $id_user): ?GangMember
     {
         $sql = "
@@ -58,11 +74,13 @@ class GangMemberRepository extends GenericRepository
     }
 
     /**
-     * Finds all GangMembers belonging to a given Gang ID.
+     * Finds all gang members (patrol members) within a specific patrol.
      *
-     * @param int $gangId
-     * @return GangMember[]
-     * @throws DatabaseException
+     * Each returned GangMember includes user metadata, patrol info, troop info, and task stats.
+     *
+     * @param int $patrolId The ID of the patrol (gang).
+     * @return GangMember[] Array of GangMember models.
+     * @throws DatabaseException If a database error occurs.
      */
     public function findAllByGangId(int $patrolId): array
     {
@@ -102,11 +120,13 @@ class GangMemberRepository extends GenericRepository
     }
 
     /**
-     * Finds all GangMembers belonging to a given Troop ID.
+     * Finds all gang members belonging to a specific troop, across all its patrols.
      *
-     * @param int $troopId
-     * @return GangMember[]
-     * @throws DatabaseException
+     * Each returned GangMember includes user metadata, patrol info, troop info, and task stats.
+     *
+     * @param int $troopId The ID of the troop.
+     * @return GangMember[] Array of GangMember models.
+     * @throws DatabaseException If a database error occurs.
      */
     public function findAllByTroopId(int $troopId): array
     {

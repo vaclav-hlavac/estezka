@@ -6,6 +6,11 @@ use InvalidArgumentException;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * User model representing a user record in the system.
+ *
+ * Extends BaseModel to provide validation, serialization, and DB compatibility.
+ */
 class User extends BaseModel {
     public ?int $id_user;
     public string $nickname;
@@ -61,6 +66,11 @@ class User extends BaseModel {
         return $data;
     }
 
+    /**
+     * Returns the payload to include in a JWT token.
+     *
+     * @return array Associative array with `id_user`, `email`, and `exp` (expiration timestamp).
+     */
     public function getPayload(): array {
         return [
             'id_user' => $this->id_user,

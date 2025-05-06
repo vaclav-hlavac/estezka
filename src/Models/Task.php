@@ -3,6 +3,11 @@
 namespace App\Models;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * Task model representing a skill-based or progression task assigned optionally to a troop.
+ *
+ * Contains task metadata such as name, description, categorization, and path level.
+ */
 class Task extends BaseModel {
     public ?int $id_task;
     public int $number;

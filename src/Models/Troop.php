@@ -4,6 +4,11 @@ namespace App\Models;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+/**
+ * Troop model representing a scouting troop entity.
+ *
+ * Provides basic serialization and validation logic for a troop, including its name and optional ID.
+ */
 class Troop extends BaseModel {
     public string $name;
     public ?int $id_troop;

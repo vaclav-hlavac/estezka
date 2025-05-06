@@ -10,6 +10,13 @@ use PDOException;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+/**
+ * Repository for managing patrol leaders (gang leaders) stored in the `patrol_leader` table.
+ *
+ * Provides enriched queries for loading gang leadership roles with related patrol and troop metadata.
+ *
+ * @extends GenericRepository<GangLeader>
+ */
 class GangLeaderRepository extends GenericRepository
 {
     public function __construct(PDO $pdo) {

@@ -4,6 +4,12 @@ namespace App\Models;
 
 use Random\RandomException;
 
+/**
+ * Gang model representing a patrol within a troop.
+ *
+ * Contains identifying information including name, troop ID, color, and invite code.
+ * Invite code is auto-generated if not provided.
+ */
 class Gang extends BaseModel
 {
     public string $name;
@@ -48,6 +54,12 @@ class Gang extends BaseModel
         return $this->id_patrol;
     }
 
+    /**
+     * Regenerates the invite code with a new 64-character secure random string.
+     *
+     * @return void
+     * @throws \Random\RandomException If random generation fails.
+     */
     public function refreshInviteCode(){
         $this->invite_code = bin2hex(random_bytes(32));
     }

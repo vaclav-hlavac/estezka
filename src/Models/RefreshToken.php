@@ -7,6 +7,12 @@ use DateMalformedStringException;
 use DateTime;
 use Random\RandomException;
 
+/**
+ * RefreshToken model representing a persistent token used for user session renewal.
+ *
+ * Automatically generates a secure token and expiration timestamp.
+ * Can be serialized for storage or transferred as JSON.
+ */
 class RefreshToken extends BaseModel
 {
     public ?int $id_refresh_token;
@@ -38,7 +44,10 @@ class RefreshToken extends BaseModel
     }
 
     /**
-     * @throws RandomException
+     * Regenerates the refresh token with a new secure random value.
+     *
+     * @return void
+     * @throws \Random\RandomException If random generation fails.
      */
     public function generateNewToken(): void
     {

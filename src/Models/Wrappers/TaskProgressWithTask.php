@@ -6,6 +6,11 @@ use App\Models\Task;
 use App\Models\TaskProgress;
 use JsonSerializable;
 
+/**
+ * Wrapper that combines a TaskProgress instance with its corresponding Task.
+ *
+ * Useful for endpoints that need to show both the user's progress and task metadata in one response.
+ */
 class TaskProgressWithTask implements JsonSerializable
 {
     public TaskProgress $progress;

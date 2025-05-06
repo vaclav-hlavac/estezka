@@ -10,6 +10,13 @@ use PDOException;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+/**
+ * Repository for managing troop leaders stored in the `troop_leader` table.
+ *
+ * Provides methods for accessing and validating troop leadership roles enriched with troop metadata.
+ *
+ * @extends GenericRepository<TroopLeader>
+ */
 class TroopLeaderRepository extends GenericRepository
 {
     public function __construct(PDO $pdo) {
