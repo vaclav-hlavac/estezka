@@ -15,123 +15,16 @@
         }
     ],
     "paths": {
-        "/troops": {
-            "get": {
-                "tags": [
-                    "Troops"
-                ],
-                "summary": "Získat všechny oddíly",
-                "operationId": "5b2ff350ee62121360f48b9e94c3cf26",
-                "responses": {
-                    "200": {
-                        "description": "Seznam oddílů"
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Troops"
-                ],
-                "summary": "Vytvořit nový oddíl",
-                "operationId": "b28cd686db218af6d1dc38367a98d80b",
-                "responses": {
-                    "201": {
-                        "description": "Nový oddíl"
-                    },
-                    "400": {
-                        "description": "Chybějící název"
-                    }
-                }
-            }
-        },
-        "/troops/{id}": {
-            "get": {
-                "tags": [
-                    "Troops"
-                ],
-                "summary": "Získat konkrétní oddíl",
-                "operationId": "256ab16280751061915d87893364da6d",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Popis oddílu"
-                    },
-                    "401": {
-                        "description": "Oddíl nenalezen"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Troops"
-                ],
-                "summary": "Upravit oddíl",
-                "operationId": "26b2345eb9a923729d741f3eda1fb373",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Nový oddíl vytvořen"
-                    },
-                    "201": {
-                        "description": "Oddíl upraven"
-                    },
-                    "400": {
-                        "description": "Chybí argument"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Troops"
-                ],
-                "summary": "Upravit oddíl",
-                "operationId": "b6ac1a373bffda2a83fae97ce196d1ad",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Oddíl smazán"
-                    },
-                    "404": {
-                        "description": "Oddíl nenalezen"
-                    }
-                }
-            }
-        },
-        "/troops/{id}/gang": {
+        "/auth": {},
+        "/troops": {},
+        "/troops/{id}/patrol": {
             "get": {
                 "tags": [
                     "Troops",
-                    "Gangs"
+                    "Patrols"
                 ],
                 "summary": "Získat všechny družiny oddílu",
-                "operationId": "250c8f043b40759c67fe1b89a6c6ef6d",
+                "operationId": "9260105616f6cabd503b4064bb968480",
                 "parameters": [
                     {
                         "name": "id",
@@ -150,10 +43,11 @@
             },
             "post": {
                 "tags": [
-                    "Troops"
+                    "Troops",
+                    "Patrols"
                 ],
                 "summary": "Vytvořit novou družinu v oddíle",
-                "operationId": "7e7215f6ae3f7198986a5d90aa20103a",
+                "operationId": "5be23e51f178fb3884a7525677ac8986",
                 "parameters": [
                     {
                         "name": "id",
@@ -181,8 +75,8 @@
             "description": "Správa oddílů"
         },
         {
-            "name": "Gangs",
-            "description": "Gangs"
+            "name": "Patrols",
+            "description": "Patrols"
         }
     ]
 }

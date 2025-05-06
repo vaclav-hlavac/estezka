@@ -8,7 +8,9 @@ use PDO;
 use PDOException;
 
 /**
- * Repository for accessing notification data.
+ * Repository for accessing notification data from the `notification` table.
+ *
+ * Provides methods to retrieve notifications for a user and to mark them as received.
  *
  * @extends GenericRepository<Notification>
  */
@@ -22,9 +24,11 @@ class NotificationRepository extends GenericRepository
     /**
      * Returns all notifications received by a given user.
      *
-     * @param int $receiverId
-     * @return Notification[]
-     * @throws DatabaseException
+     * Notifications are ordered by ID in descending order (latest first).
+     *
+     * @param int $receiverId The ID of the user receiving the notifications.
+     * @return Notification[] Array of Notification model instances.
+     * @throws DatabaseException If a database error occurs.
      */
     public function findAllForReceiver(int $receiverId): array
     {
@@ -40,11 +44,11 @@ class NotificationRepository extends GenericRepository
     }
 
     /**
-     * Marks a notification as received.
+     * Marks a specific notification as received (sets `was_received = 1`).
      *
-     * @param int $notificationId
-     * @return bool
-     * @throws DatabaseException
+     * @param int $notificationId The ID of the notification to update.
+     * @return bool True if the update was successful, false otherwise.
+     * @throws DatabaseException If a database error occurs.
      */
     public function markAsReceived(int $notificationId): bool
     {

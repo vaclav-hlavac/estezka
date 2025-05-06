@@ -10,6 +10,10 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 /**
+ * Repository for managing task progress records stored in the `task_progress` table.
+ *
+ * Handles creation of progress entries for users, updates of individual fields, and retrieval of records.
+ *
  * @extends GenericRepository<TaskProgress>
  */
 class TaskProgressRepository extends GenericRepository {
@@ -18,12 +22,14 @@ class TaskProgressRepository extends GenericRepository {
     }
 
     /**
-     * Create task_progress for all general tasks and for all tasks
-     * of a troop, that the user is in (over patrol_member → patrol → troop).
+     * Create progress entries for all tasks available to the given user.
      *
-     * @param int $id_user ID uživatele (musí existovat v patrol_member).
+     * This includes both general tasks (`id_troop IS NULL`) and tasks associated
+     * with the troop that the user's patrol belongs to.
+     *
+     * @param int $id_user The ID of the user (must be present in `patrol_member`).
      * @return void
-     * @throws DatabaseException pokud dojde k DB chybě.
+     * @throws DatabaseException If the user is not in a patrol or a DB error occurs.
      */
     public function createAllToUser(int $id_user): void
     {
@@ -71,92 +77,11 @@ class TaskProgressRepository extends GenericRepository {
     }
 
     /**
-     * Saves DateTime atribut to planned_to column of Task by task's ID
-     * @param int $id
-     * @param DateTime $plannedTo
-     * @return void
-     * @throws DatabaseException
-     */
-    public function savePlannedTo(int $id, DateTime $plannedTo): void {
-        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET planned_to = ? WHERE {$this->primaryKey} = ?");
-
-        try {
-            $stmt->execute([$plannedTo->format('Y-m-d'), $id]);
-        } catch (PDOException $e) {
-            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
-        }
-    }
-
-    /**
-     * @param int $id
-     * @param DateTime $completedAt
-     * @return void
-     * @throws DatabaseException
-     */
-    public function saveCompletedAt(int $id, DateTime $completedAt): void {
-        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET completed_at = ? WHERE {$this->primaryKey} = ?");
-
-        try {
-            $stmt->execute([$completedAt->format('Y-m-d H:i:s'), $id]);
-        } catch (PDOException $e) {
-            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
-        }
-    }
-
-    /**
-     * @param int $id
-     * @param int $confirmedBy
-     * @return void
-     * @throws DatabaseException
-     */
-    public function saveConfirmedBy(int $id, int $confirmedBy): void {
-        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET confirmed_by = ? WHERE {$this->primaryKey} = ?");
-
-        try {
-            $stmt->execute([$confirmedBy, $id]);
-        } catch (PDOException $e) {
-            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
-        }
-    }
-
-    /**
-     * @param int $id
-     * @param int $confirmedAt
-     * @return void
-     * @throws DatabaseException
-     */
-    public function saveConfirmedAt(int $id, int $confirmedAt): void {
-        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET confirmed_at = ? WHERE {$this->primaryKey} = ?");
-
-        try{
-            $stmt->execute([$confirmedAt->format('Y-m-d H:i:s'), $id]);
-        } catch (PDOException $e) {
-            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
-        }
-    }
-
-    /**
-     * @param int $id
-     * @param string $filledText
-     * @return void
-     * @throws DatabaseException
-     */
-    public function saveFilledText(int $id, string $filledText): void {
-        $stmt = $this->pdo->prepare("UPDATE {$this->table} SET filled_text = ? WHERE {$this->primaryKey} = ?");
-
-        try{
-            $stmt->execute([$filledText, $id]);
-        } catch (PDOException $e) {
-            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
-        }
-    }
-
-    /**
-     * CHeck, if user (id_user) has already inserted any task_progress.
+     * Check whether the user has any task progress records.
      *
-     * @param int $id_user
-     * @return bool true, if exists at least one row
-     * @throws DatabaseException
+     * @param int $id_user The ID of the user to check.
+     * @return bool True if at least one task progress record exists, false otherwise.
+     * @throws DatabaseException If a database error occurs.
      */
     public function userHasAnyProgress(int $id_user): bool
     {
@@ -177,11 +102,11 @@ class TaskProgressRepository extends GenericRepository {
 
 
     /**
-     * Retrieves all task progress records associated with a specific user.
+     * Retrieve all task progress records for a specific user.
      *
-     * @param int $id_user The ID of the user whose task progress we want to retrieve.
-     * @return array<TaskProgress> An array of all matching task progress records.
-     * @throws DatabaseException If a database error occurs during the operation.
+     * @param int $id_user The ID of the user whose task progress should be retrieved.
+     * @return TaskProgress[] Array of TaskProgress objects.
+     * @throws DatabaseException If a database error occurs.
      */
     public function findAllByIdUser(int $id_user): array
     {

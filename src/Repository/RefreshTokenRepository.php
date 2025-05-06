@@ -11,6 +11,13 @@ use PDOException;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 
+/**
+ * Repository for managing refresh tokens stored in the `refresh_tokens` table.
+ *
+ * Provides methods to check token existence and to find the associated user ID.
+ *
+ * @extends GenericRepository<RefreshToken>
+ */
 class RefreshTokenRepository extends GenericRepository
 {
     public function __construct(PDO $pdo) {
@@ -18,9 +25,11 @@ class RefreshTokenRepository extends GenericRepository
     }
 
     /**
-     * @param string $token
-     * @return Bool
-     * @throws DatabaseException
+     * Checks whether a refresh token exists in the database.
+     *
+     * @param string $token The refresh token to check.
+     * @return bool True if the token exists, false otherwise.
+     * @throws DatabaseException If a database error occurs.
      */
     public function tokenExists(string $token): bool
     {
@@ -34,9 +43,11 @@ class RefreshTokenRepository extends GenericRepository
     }
 
     /**
-     * @param string $refreshToken
-     * @return Int id_user
-     * @throws DatabaseException
+     * Finds the user ID associated with a given refresh token.
+     *
+     * @param string $refreshToken The refresh token to search by.
+     * @return int The ID of the user associated with the token.
+     * @throws DatabaseException If the token is not found or a database error occurs.
      */
     public function findUserIdByToken(string $refreshToken): int
     {

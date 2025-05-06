@@ -11,6 +11,10 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 /**
+ * Repository for managing patrols (represented as `Gang` models) stored in the `patrol` table.
+ *
+ * Provides access to patrols by troop or invite code.
+ *
  * @extends GenericRepository<Gang>
  */
 class GangRepository extends GenericRepository {
@@ -19,9 +23,11 @@ class GangRepository extends GenericRepository {
     }
 
     /**
-     * @param int $id_troop
-     * @return array<Gang>
-     * @throws DatabaseException
+     * Find all patrols (gangs) that belong to the specified troop.
+     *
+     * @param int $id_troop The ID of the troop to fetch gangs for.
+     * @return Gang[] Array of Gang instances belonging to the troop.
+     * @throws DatabaseException If a database error occurs.
      */
     public function findAllByTroopId(int $id_troop): array
     {
@@ -36,6 +42,13 @@ class GangRepository extends GenericRepository {
         return array_map(fn($row) => $this->hydrateModel($row), $results);
     }
 
+    /**
+     * Find a patrol (gang) using its invite code.
+     *
+     * @param string $invite_code The unique invite code for the patrol.
+     * @return Gang|null The matching Gang instance or null if not found.
+     * @throws DatabaseException If a database error occurs.
+     */
     public function findGangByInviteCode(string $invite_code): ?Gang {
         $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE invite_code = :invite_code");
         try {

@@ -15,6 +15,12 @@ use App\Exceptions\DatabaseException;
 use DI\NotFoundException;
 use PDO;
 
+/**
+ * Service responsible for loading a user along with all their assigned roles.
+ *
+ * It aggregates role data from various role-specific repositories (e.g. gang member, gang leader, troop leader)
+ * and wraps it together with the base user entity into a single `UserWithRoles` object.
+ */
 class UserRolesService
 {
     private UserRepository $userRepository;
@@ -33,9 +39,13 @@ class UserRolesService
     /**
      * Load a user with all their roles.
      *
-     * @param int $userId
-     * @return UserWithRoles|null
-     * @throws DatabaseException|NotFoundException
+     * Retrieves the user entity by ID and attempts to load all role information associated with the user.
+     * Roles include GangMember (optional), GangLeader (can be multiple), and TroopLeader (can be multiple).
+     *
+     * @param int $userId The ID of the user to load.
+     * @return UserWithRoles|null Returns a wrapper containing the user and their roles, or null if the user does not exist.
+     * @throws DatabaseException If a database error occurs during any of the queries.
+     * @throws NotFoundException If the user with the given ID is not found.
      */
     public function loadByUserId(int $userId): ?UserWithRoles
     {

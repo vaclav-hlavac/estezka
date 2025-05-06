@@ -13,6 +13,10 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 /**
+ * Repository class for accessing and managing `troop` data and related user-role relationships.
+ *
+ * Provides methods for fetching troop members, enriched gang member data, and verifying role-based membership.
+ *
  * @extends GenericRepository<Troop>
  */
 class TroopRepository extends GenericRepository {
@@ -20,24 +24,15 @@ class TroopRepository extends GenericRepository {
         parent::__construct($pdo, 'troop', 'id_troop', Troop::class);
     }
 
-    public function findAllMembersById(int $id_troop): array {
-        try{
-            $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id_troop");
-            $stmt->execute(['id_troop' => $id_troop]);
-
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            throw new DatabaseException("Database error: " . $e->getMessage(), 500, $e);
-        }
-        return array_map(fn($row) => $this->hydrateModel($row), $results);
-    }
-
     /**
-     * Find all patrol members belonging to a troop, including optional fields.
+     * Find all gang members (patrol members) associated with the given troop ID.
      *
-     * @param int $troopId
-     * @return GangMember[]
-     * @throws DatabaseException
+     * Returns a detailed list of `GangMember` objects, enriched with patrol and troop metadata,
+     * user avatar, nickname, and task progress summary.
+     *
+     * @param int $troopId The ID of the troop.
+     * @return GangMember[] Array of enriched GangMember instances.
+     * @throws DatabaseException If a database error occurs.
      */
     public function findAllMembersWithRoleGangMember(int $troopId): array
     {
@@ -87,12 +82,13 @@ class TroopRepository extends GenericRepository {
     }
 
     /**
-     * Checks whether the given user is a patrol member in a patrol that belongs to the specified troop.
+     * Checks whether the specified user is a gang member (patrol member)
+     * in a patrol that belongs to the given troop.
      *
-     * @param int $userId   The ID of the user to check.
-     * @param int $troopId  The ID of the troop to verify membership within.
-     * @return bool True if the user is a patrol member in the troop, false otherwise.
-     * @throws DatabaseException If a database error occurs during the check.
+     * @param int $userId The ID of the user to verify.
+     * @param int $troopId The ID of the troop to check membership against.
+     * @return bool True if the user is a gang member in the troop, false otherwise.
+     * @throws DatabaseException If a database error occurs.
      */
     public function isUserGangMemberInTroop(int $userId, int $troopId): bool
     {

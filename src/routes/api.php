@@ -68,8 +68,6 @@ return function (App $app) {
     $userController = new UserController($pdo);
 
     $app->group('/users', function ($users) use ($userController) {
-        $users->get('', [$userController, 'getAll']);
-
         $users->get('/{id}', [$userController, 'getById']);
         $users->patch('/me', [$userController, 'updateSelf']);
 
@@ -79,9 +77,6 @@ return function (App $app) {
     $troopController = new TroopController($pdo);
 
     $app->group('/troops', function ($troops) use ($troopController) {
-        $troops->get('', [$troopController, 'getAll']);
-        $troops->post('', [$troopController, 'create']);
-
 
         $troops->get('/{id}', [$troopController, 'getById']);
         $troops->put('/{id}', [$troopController, 'update']);

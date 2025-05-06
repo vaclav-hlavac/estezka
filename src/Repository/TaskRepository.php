@@ -10,6 +10,10 @@ use App\Models\Task;
 use PDOException;
 
 /**
+ * Repository class for accessing tasks from the `task` table.
+ *
+ * Focuses on retrieving general tasks (i.e., not assigned to a specific troop) and filtering by path level.
+ *
  * @extends GenericRepository<Task>
  */
 class TaskRepository extends GenericRepository {
@@ -18,8 +22,12 @@ class TaskRepository extends GenericRepository {
     }
 
     /**
-     * @return array
-     * @throws DatabaseException
+     * Retrieve all general tasks that are not assigned to any troop.
+     *
+     * A general task is identified by having `id_troop IS NULL`.
+     *
+     * @return Task[] Array of Task objects that are general (global).
+     * @throws DatabaseException If a database error occurs during the query.
      */
     public function findAllGeneralTasks(): array
     {
@@ -33,9 +41,14 @@ class TaskRepository extends GenericRepository {
     }
 
     /**
-     * @param int $pathLevel
-     * @return array
-     * @throws DatabaseException
+     * Retrieve all general tasks filtered by a specific path level.
+     *
+     * General tasks are those not assigned to any troop (`id_troop IS NULL`)
+     * and that match the given `path_level`.
+     *
+     * @param int $pathLevel The path level to filter general tasks by.
+     * @return Task[] Array of general Task objects matching the given path level.
+     * @throws DatabaseException If a database error occurs during the query.
      */
     public function findAllGeneralTasksByPathLevel(int $pathLevel): array
     {
