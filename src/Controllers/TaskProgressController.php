@@ -167,6 +167,9 @@ class TaskProgressController extends CRUDController
         if ($oldStatus !== 'signed' && $taskProgress->status === 'signed') {
             $this->notifyLeadersAboutTaskStatusChange($taskProgress, $gangMember->id_troop);
         }
+        if($oldStatus !== 'confirmed' && $taskProgress->status === 'confirmed'){
+            $this->notifyMemberAboutTaskStatusChange($taskProgress, $taskProgress->id_confirmed_by);
+        }
 
         return JsonResponseHelper::jsonResponse($updated, 200, $response);
     }
@@ -229,7 +232,6 @@ class TaskProgressController extends CRUDController
         $gangLeaderRepo = new GangLeaderRepository($this->pdo);
         $troopLeaderRepo = new TroopLeaderRepository($this->pdo);
         $notificationRepo = new NotificationRepository($this->pdo);
-        error_log("test");
 
         // Find user's gang (because we need gang leaders too)
         $gangMember = $gangRepo->findById($taskProgress->id_user);
@@ -238,9 +240,6 @@ class TaskProgressController extends CRUDController
         }
 
         $gangId = $gangMember->id_patrol;
-
-        error_log("gang".$gangId);
-        error_log("troop".$troopId);
 
         // Get all gang leaders
         $gangLeaders = $gangLeaderRepo->findAllByGangId($gangId);
@@ -272,6 +271,34 @@ class TaskProgressController extends CRUDController
             ]);
             $notificationRepo->insert($notification->toDatabase());
         }
+    }
+
+    private function notifyMemberAboutTaskStatusChange($taskProgress, int $leaderId): void
+    {
+        $container = require __DIR__ . '/../../src/bootstrap.php';
+        $userRepo = $container->get(UserRepository::class);
+        $leader = $userRepo->findById($leaderId);
+
+        $notificationRepo = new NotificationRepository($this->pdo);
+
+
+        $taskRepository = new TaskRepository($this->pdo);
+        $task = $taskRepository->findById($taskProgress->id_task);
+
+        // Prepare notification text
+        $text = "Potvzený úkol: \"$task->name\".";
+
+        // Send notification to member
+        $notification = new Notification([
+            'id_user_creator' => $leader->id_user,
+            'id_user_receiver' => $taskProgress->id_user,
+            'text' => $text,
+            'creator_name' => $leader->nickname,
+            'type' => 'task_signed',
+            'id_task_progress' => $taskProgress->id_task_progress,
+        ]);
+        $notificationRepo->insert($notification->toDatabase());
+
     }
 
     /**
