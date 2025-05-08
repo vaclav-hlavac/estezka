@@ -5,12 +5,14 @@ namespace App\Controllers;
 use App\Models\Roles\TroopLeader;
 use App\Repository\Roles\TroopLeaderRepository;
 use App\Utils\JsonResponseHelper;
+use Psr\Container\ContainerInterface;
 
 class TroopLeaderController extends CRUDController
 {
-    public function __construct($pdo)
+    public function __construct($pdo, ContainerInterface $container)
     {
-        parent::__construct($pdo,  TroopLeader::class, new TroopLeaderRepository($pdo));
+        $troopLeaderRepository = $container->get(TroopLeaderRepository::class);
+        parent::__construct($pdo,  $container, TroopLeader::class, $troopLeaderRepository);
     }
 
     /**

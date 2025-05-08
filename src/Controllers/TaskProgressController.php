@@ -20,12 +20,14 @@ use App\Repository\UserRepository;
 use App\Utils\JsonResponseHelper;
 use DateTime;
 use Exception;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class TaskProgressController extends CRUDController
 {
-    public function __construct($pdo) {
-        parent::__construct($pdo, TaskProgress::class, new TaskProgressRepository($pdo) );
+    public function __construct($pdo, ContainerInterface $container) {
+        $taskProgressRepo =  $container->get(TaskProgressRepository::class);
+        parent::__construct($pdo, $container, TaskProgress::class, $taskProgressRepo);
     }
 
     /**
@@ -275,8 +277,7 @@ class TaskProgressController extends CRUDController
 
     private function notifyMemberAboutTaskStatusChange($taskProgress, int $leaderId): void
     {
-        $container = require __DIR__ . '/../../src/bootstrap.php';
-        $userRepo = $container->get(UserRepository::class);
+        $userRepo = $this->container->get(UserRepository::class);
         $leader = $userRepo->findById($leaderId);
 
         $notificationRepo = new NotificationRepository($this->pdo);

@@ -43,7 +43,7 @@ final class NoAuthorizationTest extends TestCase
 
     public function testUnauthorizedAccessReturns401(): void
     {
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/users');
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/troops/1');
         $response = $this->app->handle($request);
 
         $this->assertSame(401, $response->getStatusCode());

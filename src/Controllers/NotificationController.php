@@ -14,6 +14,7 @@ use App\Repository\UserRepository;
 use App\Utils\JsonResponseHelper;
 use InvalidArgumentException;
 use PDO;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -24,11 +25,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 class NotificationController
 {
     private NotificationRepository $repository;
+    private ContainerInterface $container;
     protected PDO $pdo;
 
-    public function __construct(PDO $pdo)
+    public function __construct(PDO $pdo, ContainerInterface $container)
     {
-        $this->repository = new NotificationRepository($pdo);
+        $this->container = $container;
+        $this->repository = $container->get(NotificationRepository::class);
         $this->pdo = $pdo;
     }
 

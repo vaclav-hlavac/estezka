@@ -7,12 +7,15 @@ use App\Models\Gang;
 use App\Repository\GangRepository;
 use App\Repository\Roles\GangMemberRepository;
 use App\Utils\JsonResponseHelper;
+use PDO;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class GangController extends CRUDController
 {
-    public function __construct($pdo) {
-        parent::__construct($pdo, Gang::class, new GangRepository($pdo) );
+    public function __construct(PDO $pdo, ContainerInterface $container) {
+        $gangRepo = $container->get(GangRepository::class);
+        parent::__construct($pdo, $container,Gang::class, $gangRepo);
     }
 
     /**

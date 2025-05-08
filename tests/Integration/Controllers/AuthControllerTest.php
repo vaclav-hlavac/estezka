@@ -42,7 +42,7 @@ final class AuthControllerTest extends TestCase
         $this->userRepository = $container->get(UserRepository::class);
         $authService = $container->get(AuthService::class);
 
-        $this->controller = new AuthController($this->pdo, $authService);
+        $this->controller = new AuthController($this->pdo, $container, $authService);
 
         DatabaseCleaner::cleanAll($this->pdo);
     }
@@ -70,6 +70,9 @@ final class AuthControllerTest extends TestCase
         $response = (new ResponseFactory())->createResponse();
 
         $result = $this->controller->register($request, $response, []);
+        $body = (string)$result->getBody();
+        echo "\n📦 Response body:\n$body\n";
+
         $this->assertSame(201, $result->getStatusCode());
 
         // Verify user creation

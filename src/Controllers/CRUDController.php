@@ -9,6 +9,7 @@ use App\Utils\JsonResponseHelper;
 use DI\Container;
 use InvalidArgumentException;
 use PDO;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -33,13 +34,16 @@ abstract class CRUDController
     /** @var TRepository */
     protected GenericRepository $repository;
 
+    protected ContainerInterface $container;
+
     /**
      * @param PDO $pdo
      * @param class-string<TModel> $modelClass
      * @param GenericRepository $repository
      */
-    public function __construct(PDO $pdo, string $modelClass, GenericRepository $repository) {
+    public function __construct(PDO $pdo, ContainerInterface $container, string $modelClass, GenericRepository $repository) {
         $this->pdo = $pdo;
+        $this->container = $container;
         $this->modelClass = $modelClass;
         $this->repository = $repository;
     }

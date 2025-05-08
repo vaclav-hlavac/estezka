@@ -35,7 +35,7 @@ final class GangControllerTest extends TestCase
         $container = require __DIR__ . '/../../../tests/bootstrap.php';
 
         $this->pdo = $container->get(PDO::class);
-        $this->controller = new GangController($this->pdo);
+        $this->controller = new GangController($this->pdo, $container);
         $this->gangRepo = $container->get(GangRepository::class);
         $this->troopRepo = $container->get(TroopRepository::class);
         $this->userRepo = $container->get(UserRepository::class);

@@ -10,6 +10,7 @@ use App\Repository\TroopRepository;
 use App\Utils\JsonResponseHelper;
 use Exception;
 use App\Models\Troop;
+use Psr\Container\ContainerInterface;
 
 
 /**
@@ -18,10 +19,9 @@ use App\Models\Troop;
  */
 class TroopController extends CRUDController
 {
-    public function __construct($pdo) {
-        $container = require __DIR__ . '/../../src/bootstrap.php';
-        $troopRepo = $container->get(TroopRepository::class)->load();
-        parent::__construct($pdo, Troop::class, $troopRepo);
+    public function __construct($pdo, ContainerInterface $container) {
+        $troopRepo = $container->get(TroopRepository::class);
+        parent::__construct($pdo, $container, Troop::class, $troopRepo);
     }
 
 
@@ -84,8 +84,7 @@ class TroopController extends CRUDController
         //creating new gang
         $data['id_troop'] = $args['id'];
         $gang = new Gang($data);
-        $container = require __DIR__ . '/../../src/bootstrap.php';
-        $gangRepository = $container->get(GangRepository::class)->load();
+        $gangRepository = $this->container->get(GangRepository::class);
 
         // Refresh token
         try {
@@ -143,8 +142,7 @@ class TroopController extends CRUDController
             return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
         }
 
-        $container = require __DIR__ . '/../../src/bootstrap.php';
-        $gangRepository = $container->get(GangRepository::class)->load();
+        $gangRepository = $this->container->get(GangRepository::class);
         $gangs = $gangRepository->findAllByTroopId($args['id']);
 
 

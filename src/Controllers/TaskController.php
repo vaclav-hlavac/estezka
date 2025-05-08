@@ -8,12 +8,12 @@ use App\Models\Task;
 use App\Repository\TaskRepository;
 use App\Utils\JsonResponseHelper;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 
 class TaskController extends CRUDController{
-    public function __construct($pdo) {
-        $container = require __DIR__ . '/../../src/bootstrap.php';
+    public function __construct($pdo, ContainerInterface $container) {
         $taskRepository = $container->get(TaskRepository::class);
-        parent::__construct($pdo, Task::class, $taskRepository);
+        parent::__construct($pdo, $container, Task::class, $taskRepository);
     }
 
 

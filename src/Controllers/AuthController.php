@@ -21,6 +21,7 @@ use App\Services\UserRolesService;
 use App\Utils\JsonResponseHelper;
 use Exception;
 use PDO;
+use Psr\Container\ContainerInterface;
 
 
 /**
@@ -30,9 +31,11 @@ use PDO;
 class AuthController {
     private PDO $pdo;
     private AuthService $authService;
+    private ContainerInterface  $container;
 
-    public function __construct($pdo, $authService) {
+    public function __construct(PDO $pdo, ContainerInterface $container, AuthService $authService) {
         $this->pdo = $pdo;
+        $this->container = $container;
         $this->authService = $authService;
     }
 
@@ -87,8 +90,7 @@ class AuthController {
             $user = new User($data);
 
             // unique email check
-            $container = require __DIR__ . '/../../src/bootstrap.php';
-            $userRepository = $container->get(UserRepository::class);
+            $userRepository = $this->container->get(UserRepository::class);
 
             if($userRepository->emailExists($user->email)) {
                 return JsonResponseHelper::jsonResponse('Email already exists.', 409, $response);
@@ -169,8 +171,7 @@ class AuthController {
         // Refresh token
         try {
             $refreshToken = new RefreshToken(['id_user' => $user->getId()]);
-            $container = require __DIR__ . '/../../src/bootstrap.php';
-            $tokenRepository = $container->get(RefreshTokenRepository::class);
+            $tokenRepository = $this->container->get(RefreshTokenRepository::class);
 
             $attempts = 0;
             while ($tokenRepository->tokenExists($refreshToken->token)) {
@@ -240,8 +241,7 @@ class AuthController {
 
         // Validate refresh token
         try {
-            $container = require __DIR__ . '/../../src/bootstrap.php';
-            $tokenRepository = $container->get(RefreshTokenRepository::class);
+            $tokenRepository = $this->container->get(RefreshTokenRepository::class);
             $userId = $tokenRepository->findUserIdByToken($refreshToken);
 
             if (!$userId) {
@@ -249,7 +249,7 @@ class AuthController {
             }
 
             // Fetch user
-            $userRepository = $container->get(UserRepository::class);
+            $userRepository = $this->container->get(UserRepository::class);
             $user = $userRepository->findById($userId);
             if (!$user) {
                 return JsonResponseHelper::jsonResponse('User not found', 404, $response);
@@ -284,8 +284,7 @@ class AuthController {
     private function authenticateUser($email, $password): ?User {
         // Find user by login and verify
         $email = trim(strtolower($email));
-        $container = require __DIR__ . '/../../src/bootstrap.php';
-        $userRepository = $container->get(UserRepository::class);
+        $userRepository = $this->container->get(UserRepository::class);
         $user = $userRepository->findByEmail($email);
 
 
@@ -307,12 +306,11 @@ class AuthController {
     {
         // Creating new troop
         $troop = new Troop($data['new_troop']);
-        $container = require __DIR__ . '/../../src/bootstrap.php';
-        $troopRepository = $container->get(TroopLeaderRepository::class);
+        $troopRepository = $this->container->get(TroopRepository::class);
         $newTroop = $troopRepository->insert($troop->toDatabase());
 
         // Setting TroopLeader role
-        $troopLeaderRepository = $container->get(TroopLeaderRepository::class);
+        $troopLeaderRepository = $this->container->get(TroopLeaderRepository::class);
         $troopLeader = new TroopLeader([
             "id_user" => $savedUser->getId(),
             "id_troop" => $newTroop->getId()
@@ -330,15 +328,14 @@ class AuthController {
     {
 // User joined up an existing troop (by invite_code) => GroupMember
         // Finding gang by invite code
-        $container = require __DIR__ . '/../../src/bootstrap.php';
-        $gangRepository = $container->get(GangRepository::class);
+        $gangRepository = $this->container->get(GangRepository::class);
         $gang = $gangRepository->findGangByInviteCode($invite_code);
         if ($gang == null) {
             return false;
         }
 
         // Setting GangMember role
-        $gangMemberRepository = $container->get(GangMemberRepository::class);
+        $gangMemberRepository = $this->container->get(GangMemberRepository::class);
         $gangMember = new GangMember([
             "id_user" => $savedUser->getId(),
             "id_patrol" => $gang->getId(),
@@ -348,7 +345,7 @@ class AuthController {
         $gangMemberRepository->insert($gangMember->toDatabase());
 
         //creating task_progress for each task
-        $taskProgressRepository = $container->get(TaskProgressRepository::class);
+        $taskProgressRepository = $this->container->get(TaskProgressRepository::class);
         try {
             $taskProgressRepository->createAllToUser($savedUser->getId());
         } catch (Exception $e) {

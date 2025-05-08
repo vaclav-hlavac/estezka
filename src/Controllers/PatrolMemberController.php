@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Roles\GangMember;
 use App\Repository\Roles\GangMemberRepository;
+use Psr\Container\ContainerInterface;
 
 /**
  * @OA\Tag(name="Patrol Members", description="Manage patrol members")
@@ -11,8 +12,9 @@ use App\Repository\Roles\GangMemberRepository;
  */
 class PatrolMemberController extends CRUDController
 {
-    public function __construct($pdo) {
-        parent::__construct($pdo, GangMember::class, new GangMemberRepository($pdo) );
+    public function __construct($pdo, ContainerInterface $container) {
+        $gangMemberRepository = $container->get(GangMemberRepository::class);
+        parent::__construct($pdo, $container, GangMember::class, $gangMemberRepository);
     }
 
     /**

@@ -5,14 +5,16 @@ use App\Models\User;
 use App\Repository\UserRepository;
 use App\Services\UserRolesService;
 use App\Utils\JsonResponseHelper;
+use Psr\Container\ContainerInterface;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class UserController extends CRUDController
 {
 
-    public function __construct($pdo) {
-        parent::__construct($pdo, User::class, new UserRepository($pdo) );
+    public function __construct($pdo, ContainerInterface $container) {
+        $userRepository = $container->get(UserRepository::class);
+        parent::__construct($pdo, $container, User::class,$userRepository);
     }
 
     /**

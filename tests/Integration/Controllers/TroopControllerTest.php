@@ -31,7 +31,7 @@ final class TroopControllerTest extends TestCase
     {
         $container = require __DIR__ . '/../../../tests/bootstrap.php';
         $this->pdo = $container->get(PDO::class);
-        $this->controller = new TroopController($this->pdo);
+        $this->controller = new TroopController($this->pdo, $container);
         $this->troopRepository = $container->get(TroopRepository::class);
         $this->gangRepository = $container->get(GangRepository::class);
 
