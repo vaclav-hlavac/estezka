@@ -57,8 +57,8 @@ $container->set(TroopLeaderRepository::class, fn(ContainerInterface $c) => new T
 
 // SERVICES
 $container->set(AccessService::class, fn(ContainerInterface $c) => new AccessService(
-    $c->get(TroopRepository::class),
-    $c->get(GangRepository::class)
+    $c->get(TroopLeaderRepository::class),
+    $c->get(GangLeaderRepository::class)
 ));
 
 $container->set(AuthService::class, fn(ContainerInterface $c) => new AuthService());

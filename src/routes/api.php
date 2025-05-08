@@ -12,9 +12,9 @@ use App\Controllers\PatrolMemberController;
 use App\Controllers\TaskProgressController;
 use App\Controllers\TroopLeaderController;
 use App\Controllers\UserController;
+use App\Enums\RoleScope;
 use App\Middleware\AuthMiddleware;
-use App\Middleware\GangAuthorizationMiddleware;
-use App\Models\Troop;
+use App\Middleware\RoleScopeMiddleware;
 use App\Services\AccessService;
 use App\Services\AuthService;
 use Slim\App;
@@ -28,7 +28,9 @@ use App\Controllers\TroopController;
 return function (App $app) {
     $pdo = Database::connect();
     $container = require __DIR__ . '/../../src/bootstrap.php';
-    $authService = new AuthService();
+    $authService = $container->get(AuthService::class);
+    $accessService = $container->get(AccessService::class);
+
 
     $authController = new AuthController($pdo, $container, $authService);
     $gangController = new GangController($pdo, $container);
@@ -66,7 +68,6 @@ return function (App $app) {
         $tasks->get('/{id}', [$taskController, 'getById']);
 
         $tasks->get('/level/{pathLevel}', [$taskController, 'getAllGeneralTasksByLevel']);
-
     });
 
 
@@ -94,19 +95,19 @@ return function (App $app) {
         $troops->get('/{id}/patrols', [$troopController, 'getTroopGangs']);
         $troops->post('/{id}/patrols', [$troopController, 'createGang']);
 
-    })->add(new AuthMiddleware()); //adds authorization middleware
+    })->add(new AuthMiddleware());
 
     //************************* PATROL-LEADER ****************************************
     $app->group('/troops/{id_troop}/patrols/{id_patrol}', function ($patrolLeader) use ($patrolLeaderController) {
         $patrolLeader->post('/members/{id_user}/patrol-leaders', [$patrolLeaderController, 'create']);
         $patrolLeader->delete('/patrol-leaders/{id_patrol_leader}', [$patrolLeaderController, 'delete']);
-    })->add(new AuthMiddleware()); //adds authorization middleware
+    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::TROOP], $authService, $accessService));
 
     //************************* TROOP-LEADER ****************************************
     $app->group('/troops/{id_troop}', function ($troopLeader) use ($troopLeaderController) {
         $troopLeader->post('/members/{id_user}/troop-leaders', [$troopLeaderController, 'create']);
         $troopLeader->delete('/members/{id_user}/troop-leaders/{id_troop_leader}', [$troopLeaderController, 'delete']);
-    })->add(new AuthMiddleware()); //adds authorization middleware
+    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::TROOP], $authService, $accessService));
 
 
 
@@ -160,12 +161,12 @@ return function (App $app) {
     //************************* PATROL LEADERS ****************************************
     $app->group('/patrols', function ($gangs) use ($patrolMemberController) {
         $gangs->patch('/{id_patrol}/members/{id_user}', [$patrolMemberController, 'updatePatrolMember']);
-    })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
+    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::TROOP], $authService, $accessService));
 
     //************************* PATROL LEADERS ****************************************
     $app->group('/patrols', function ($gangs) use ($patrolLeaderController) {
         $gangs->post('/{id_patrol}/leaders', [$patrolLeaderController, 'addPatrolLeader']);
-    })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
+    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::TROOP], $authService, $accessService));
 
 
     //************************* NON-EXISTING **********************************
