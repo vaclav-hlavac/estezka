@@ -19,7 +19,9 @@ use App\Models\Troop;
 class TroopController extends CRUDController
 {
     public function __construct($pdo) {
-        parent::__construct($pdo, Troop::class, new TroopRepository($pdo));
+        $container = require __DIR__ . '/../../src/bootstrap.php';
+        $troopRepo = $container->get(TroopRepository::class)->load();
+        parent::__construct($pdo, Troop::class, $troopRepo);
     }
 
 
@@ -67,7 +69,7 @@ class TroopController extends CRUDController
         }
 
         //Existing troop control
-        $troopRepository = new TroopRepository($this->pdo);
+        $troopRepository = $this->repository;
         try {
             $troop = $troopRepository->findById($args['id']);
             if (!$troop) {
@@ -82,7 +84,8 @@ class TroopController extends CRUDController
         //creating new gang
         $data['id_troop'] = $args['id'];
         $gang = new Gang($data);
-        $gangRepository = new GangRepository($this->pdo);
+        $container = require __DIR__ . '/../../src/bootstrap.php';
+        $gangRepository = $container->get(GangRepository::class)->load();
 
         // Refresh token
         try {
@@ -132,7 +135,7 @@ class TroopController extends CRUDController
      * )
      */
     public function getTroopGangs($request, $response, $args) {
-        $troopRepository = new TroopRepository($this->pdo);
+        $troopRepository = $this->repository;
 
         $troop = $troopRepository->findById($args['id']);
         if (!$troop) {
@@ -140,7 +143,8 @@ class TroopController extends CRUDController
             return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
         }
 
-        $gangRepository = new GangRepository($this->pdo);
+        $container = require __DIR__ . '/../../src/bootstrap.php';
+        $gangRepository = $container->get(GangRepository::class)->load();
         $gangs = $gangRepository->findAllByTroopId($args['id']);
 
 

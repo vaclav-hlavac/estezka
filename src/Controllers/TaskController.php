@@ -11,7 +11,9 @@ use InvalidArgumentException;
 
 class TaskController extends CRUDController{
     public function __construct($pdo) {
-        parent::__construct($pdo, Task::class, new TaskRepository($pdo) );
+        $container = require __DIR__ . '/../../src/bootstrap.php';
+        $taskRepository = $container->get(TaskRepository::class);
+        parent::__construct($pdo, Task::class, $taskRepository);
     }
 
 
@@ -32,7 +34,7 @@ class TaskController extends CRUDController{
      * )
      */
     public function getAllGeneralTasks($request, $response, $args) {
-        $taskRepository = new TaskRepository($this->pdo);
+        $taskRepository = $this->repository;
         try {
             $tasks = $taskRepository->findAllGeneralTasks();
             return JsonResponseHelper::jsonResponse($tasks, 200, $response);
@@ -64,7 +66,7 @@ class TaskController extends CRUDController{
      * )
      */
     public function getAllGeneralTasksByLevel($request, $response, $args) {
-        $taskRepository = new TaskRepository($this->pdo);
+        $taskRepository = $this->repository;
         try {
             $tasks = $taskRepository->findAllGeneralTasksByPathLevel($args['pathLevel']);
             return JsonResponseHelper::jsonResponse($tasks, 200, $response);
