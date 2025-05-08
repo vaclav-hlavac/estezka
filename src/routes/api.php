@@ -1,11 +1,9 @@
 <?php
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-
 use App\Config\Database;
 use App\Controllers\AuthController;
 use App\Controllers\GangController;
-use App\Controllers\GangLeaderController;
 use App\Controllers\NotificationController;
 use App\Controllers\PatrolLeaderController;
 use App\Controllers\PatrolMemberController;
