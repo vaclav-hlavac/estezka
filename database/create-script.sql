@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 USE e_stezka;
 
 -- Drop tables if exist
@@ -19,7 +21,7 @@ CREATE TABLE troop (
     id_troop INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(256) NOT NULL,
     PRIMARY KEY (id_troop)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE user (
     id_user INT AUTO_INCREMENT NOT NULL,
@@ -27,11 +29,11 @@ CREATE TABLE user (
     name VARCHAR(256) NOT NULL,
     surname VARCHAR(256) NOT NULL,
     password VARCHAR(256) NOT NULL,
-    email VARCHAR(256) NOT NULL,
+    email VARCHAR(256) NOT NULL UNIQUE,
     avatar_url VARCHAR(512) DEFAULT NULL,
     notifications_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     PRIMARY KEY (id_user)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE patrol (
     id_patrol INT AUTO_INCREMENT NOT NULL,
@@ -40,21 +42,21 @@ CREATE TABLE patrol (
     color VARCHAR(256),
     invite_code VARCHAR(256) NOT NULL UNIQUE,
     PRIMARY KEY (id_patrol)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE patrol_leader (
     id_patrol_leader INT AUTO_INCREMENT NOT NULL,
     id_user INT NOT NULL,
     id_patrol INT NOT NULL,
     PRIMARY KEY (id_patrol_leader)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE patrol_member (
     id_user INT NOT NULL,
     id_patrol INT,
     active_path_level INT,
     PRIMARY KEY (id_user)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE task (
     id_task INT AUTO_INCREMENT NOT NULL,
@@ -67,7 +69,7 @@ CREATE TABLE task (
     path_level INT NOT NULL,
     id_troop INT,
     PRIMARY KEY (id_task)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE task_progress (
     id_task_progress INT AUTO_INCREMENT NOT NULL,
@@ -82,7 +84,7 @@ CREATE TABLE task_progress (
     filled_text TEXT,
     PRIMARY KEY (id_task_progress),
     UNIQUE KEY (id_user, id_task)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE notification (
     id_notification INT AUTO_INCREMENT NOT NULL,
@@ -96,7 +98,7 @@ CREATE TABLE notification (
     id_task_progress INT,
     creator_name VARCHAR(50),
     PRIMARY KEY (id_notification)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE comment (
     id_comment INT AUTO_INCREMENT NOT NULL,
@@ -106,14 +108,14 @@ CREATE TABLE comment (
     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     text TEXT NOT NULL,
     PRIMARY KEY (id_comment)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE troop_leader (
     id_troop_leader INT AUTO_INCREMENT NOT NULL,
     id_user INT NOT NULL,
     id_troop INT,
     PRIMARY KEY (id_troop_leader)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE refresh_tokens (
     id_refresh_token INT AUTO_INCREMENT PRIMARY KEY,
@@ -121,9 +123,10 @@ CREATE TABLE refresh_tokens (
     token VARCHAR(255) NOT NULL UNIQUE,
     expires_at DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create foreign keys
+SET FOREIGN_KEY_CHECKS = 1;
 
 ALTER TABLE patrol
 ADD CONSTRAINT fk_patrol_troop
