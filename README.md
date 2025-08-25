@@ -30,14 +30,15 @@ is designed with simplicity in mind while keeping the concepts of the paper vers
 ## 🚀 Getting Started (Local Development)
 
 1. Clone the repository:
-   ```bash
+```bash
    git clone https://github.com/vaclav-hlavac/estezka.git
    cd estezka
+```
    
 2. Install dependencies:
-
+```bash
   composer install
-
+ ```
 3. Copy the environment configuration:
   cp .env.example .env
   Adjust values for database connection, JWT secret, etc.
