@@ -57,6 +57,47 @@ http://localhost:8080
 ```
 ---
 
+## 🗄 Database Setup
+
+This project requires a MySQL/MariaDB database.  
+The schema is defined in [`database/create-script.sql`](./database/create-script.sql).
+
+1. **Create the database:**
+   ```bash
+   mysql -u USER -p -e "CREATE DATABASE IF NOT EXISTS e_stezka CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   ```
+
+2. **Apply the schema:**
+   ```bash
+   mysql -u USER -p e_stezka < database/create-script.sql
+   ```
+
+3. **Configure the application:**
+   Copy the example environment file and adjust it to match your local database credentials:
+   ```bash
+   cp .env.example .env
+   ```
+   Set variables such as:
+   ```ini
+   DB_HOST=localhost
+   DB_NAME=e_stezka
+   DB_USER=your_username
+   DB_PASS=your_password
+   JWT_SECRET=your_secret
+   ```
+
+4. **Run tests (optional):**  
+   Tests use a separate database defined in `.env.testing`.  
+   Make sure to create it and apply the schema as well:
+   ```bash
+   mysql -u USER -p -e "CREATE DATABASE IF NOT EXISTS e_stezka_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   mysql -u USER -p e_stezka_test < database/create-script.sql
+   ```
+
+> **Note:** The schema already uses `utf8mb4` encoding, `InnoDB` engine and proper foreign keys.  
+
+---
+
 ## 🧪 Testing
 Run unit, integration, and functional tests with:
 ```bash
