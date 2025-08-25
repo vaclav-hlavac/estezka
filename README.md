@@ -59,7 +59,9 @@ http://localhost:8080
 
 ## 🧪 Testing
 Run unit, integration, and functional tests with:
+```bash
 vendor/bin/phpunit
+```
 Tests use a separate database configuration defined in .env.testing.
 
 ---
