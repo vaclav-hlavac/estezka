@@ -156,15 +156,15 @@ return function (App $app) {
         $gangs->delete('/{id}', [$gangController, 'delete']);
     })->add(new AuthMiddleware())/*->add(new GangAuthorizationMiddleware())*/;
 
-    //************************* PATROL LEADERS ****************************************
+    //************************* PATROL MEMBERS ****************************************
     $app->group('/patrols', function ($gangs) use ($patrolMemberController) {
         $gangs->patch('/{id_patrol}/members/{id_user}', [$patrolMemberController, 'updatePatrolMember']);
-    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::TROOP], $authService, $accessService));
+    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::PATROL], $authService, $accessService));
 
     //************************* PATROL LEADERS ****************************************
     $app->group('/patrols', function ($gangs) use ($patrolLeaderController) {
         $gangs->post('/{id_patrol}/leaders', [$patrolLeaderController, 'addPatrolLeader']);
-    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::TROOP], $authService, $accessService));
+    })->add(new AuthMiddleware())->add(new RoleScopeMiddleware([RoleScope::PATROL], $authService, $accessService));
 
 
     //************************* NON-EXISTING **********************************

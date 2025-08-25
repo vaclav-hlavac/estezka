@@ -120,6 +120,8 @@ class TroopLeaderRepository extends GenericRepository
      */
     public function findByUserAndTroopId(int $userId, int $troopId): ?TroopLeader
     {
+        error_log("Checking for user $userId in troop $troopId");
+
         $sql = "
             SELECT 
                 tl.*,

@@ -1,0 +1,16 @@
+# Composer
+/vendor/
+
+# PHPStorm / IDE
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.testing
+
+# Cache / temp
+/cache/

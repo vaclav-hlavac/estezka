@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Slim\Exception\HttpForbiddenException;
+use Slim\Routing\RouteContext;
 
 /**
  * Middleware that restricts access to routes based on the user's role and scope.
@@ -47,27 +48,34 @@ class RoleScopeMiddleware implements MiddlewareInterface
      */
     public function process(Request $request, RequestHandlerInterface $handler): Response
     {
-        $userId = $this->authService->getUserIdFromToken($request);
+        $route = RouteContext::fromRequest($request)->getRoute();
 
+        $token = $request->getHeaderLine('Authorization');
+        $token = str_replace('Bearer ', '', $token);
+        $userId = $this->authService->getUserIdFromToken($token);
 
         foreach ($this->requiredScopes as $scope) {
             switch ($scope) {
                 case RoleScope::SELF:
-                    $idInPath = (int) $request->getAttribute('id_user');
+                    $idInPath = (int) $route?->getArgument('id_user');
+
                     if ($idInPath === $userId) {
                         return $handler->handle($request);
                     }
                     break;
 
                 case RoleScope::PATROL:
-                    $gangId = (int) $request->getAttribute('id_patrol');
+                    $gangId = (int) $route?->getArgument('id_patrol');
+
                     if ($this->accessService->hasAccessToGang($userId, $gangId)) {
                         return $handler->handle($request);
                     }
                     break;
 
                 case RoleScope::TROOP:
-                    $troopId = (int) $request->getAttribute('id_troop');
+                    $troopId = (int) $route?->getArgument('id_troop');
+
+                    error_log($troopId);
                     if ($this->accessService->hasAccessToTroop($userId, $troopId)) {
                         return $handler->handle($request);
                     }
