@@ -3,6 +3,8 @@
 **E-stezka** is a modern digital tool for the Czech Scouting "stezka" (personal development path).  
 It allows scouts to clearly track their progress, complete tasks, and keep records of achievements – directly on their mobile device.  
 Leaders can easily review, approve, and manage members of their troop or patrol.
+- Find more at: [e-stezka.skauting.cz](https://e-stezka.skauting.cz/)
+
 
 ---
 
@@ -12,6 +14,7 @@ This repository contains the **server application** written in PHP (Slim framewo
 It provides a REST API for managing E-stezka data.
 
 - **API Documentation**: see the [OpenAPI specification](./src/OpenApiSpec.php)  
+- Or view it online at: [e-stezka.skauting.cz/swagger](https://e-stezka.skauting.cz/swagger/)
 
 ---
 
@@ -40,25 +43,34 @@ is designed with simplicity in mind while keeping the concepts of the paper vers
   composer install
  ```
 3. Copy the environment configuration:
+```bash
   cp .env.example .env
   Adjust values for database connection, JWT secret, etc.
+```
+5. Run the local server (using PHP built-in):
+```bash
+php -S localhost:8080 -t public
+```
+7. The API is now available at:
+```bash
+http://localhost:8080
+```
+---
 
-4. Run the local server (using PHP built-in):
-  php -S localhost:8080 -t public
-
-5. The API is now available at:
-  http://localhost:8080
-
-🧪 Testing
+## 🧪 Testing
 Run unit, integration, and functional tests with:
 vendor/bin/phpunit
 Tests use a separate database configuration defined in .env.testing.
 
-🤝 Contributing
+---
+
+## 🤝 Contributing
 Contributions are welcome!
 Please open an issue or submit a pull request.
 
-📄 License
+---
+
+## 📄 License
 Author: Václav Hlaváč  
 Title: E-Stezka – Mobile application for the scouting organization  
 
@@ -69,5 +81,3 @@ This work (including all source code and documentation) is licensed under a **no
 - This permission is unlimited in time, territory, and quantity.  
 - Any **commercial use** requires the **prior express consent of the author**.
 
-
----
